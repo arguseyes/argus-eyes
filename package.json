@@ -1,0 +1,27 @@
+{
+  "name": "argus-eyes",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/branneman/argus-eyes.git"
+  },
+  "keywords": [
+    "visual regression",
+    "visual",
+    "regression",
+    "testing",
+    "phantomjs",
+    "imagemagick"
+  ],
+  "author": "Bran van der Meer <branmovic@gmail.com> (http://bran.name/)",
+  "contributors": [
+    "Maarten Groeneweg <mgroeneweg@mirabeau.nl>"
+  ],
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/branneman/argus-eyes/issues"
+  },
+  "homepage": "https://github.com/branneman/argus-eyes#readme"
+}
