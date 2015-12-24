@@ -15,9 +15,7 @@ module.exports = {
 var defaultConfig = {
     config: process.cwd() + '/argus-eyes.json',
     base: process.cwd() + '/.argus-eyes',
-    color: true,
-    components: [],
-    pages: []
+    color: true
 };
 
 /**
@@ -31,7 +29,11 @@ function loadConfig(argv) {
     var config = getConfiguration(argv);
 
     // Load config file
-    var configFile = require(config.config);
+    try {
+        var configFile = require(config.config);
+    } catch (e) {
+        return config;
+    }
 
     // Merge config
     config.components = configFile.components;

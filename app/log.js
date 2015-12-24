@@ -10,6 +10,10 @@ module.exports = function(color) {
             var colored = timestamp() + str;
             console.log(color ? colored : chalk.stripColor(colored));
         },
+        success: function(str) {
+            var colored = timestamp() + chalk.green(str);
+            console.log(color ? colored : chalk.stripColor(colored));
+        },
         warning: function(str) {
             var colored = timestamp() + chalk.yellow(str);
             console.log(color ? colored : chalk.stripColor(colored));

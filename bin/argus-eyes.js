@@ -3,6 +3,7 @@
 process.title = 'argus-eyes';
 
 // Load dependencies
+var pkg       = require('../package');
 var cfgLoader = require('../app/configLoader');
 var util      = require('../app/util');
 var add       = require('../app/add');
@@ -15,6 +16,13 @@ var action = cfgLoader.getAction(argv);
 
 // Initialize logger
 global.log = require('../app/log')(config.color);
+log.success('argus-eyes - v' + pkg.version);
+
+// Test required cli arguments
+if (!config.components || !config.pages) {
+    log.error('No config file found!');
+    process.exit(-1);
+}
 if (!action) {
     log.error('No action found! Specify either `add` or `compare`');
     process.exit(-1);
