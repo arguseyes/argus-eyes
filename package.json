@@ -2,7 +2,15 @@
   "name": "argus-eyes",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "bin/argus-eyes.js",
+  "bin": {
+    "argus-eyes": "bin/argus-eyes.js"
+  },
+  "preferGlobal": true,
+  "engines": {
+    "node": ">=4.0"
+  },
+  "engineStrict": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/branneman/argus-eyes.git"
@@ -23,5 +31,11 @@
   "bugs": {
     "url": "https://github.com/branneman/argus-eyes/issues"
   },
-  "homepage": "https://github.com/branneman/argus-eyes#readme"
+  "homepage": "https://github.com/branneman/argus-eyes#readme",
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "mkdirp": "^0.5.1",
+    "phantomjs": "^1.9.19",
+    "yargs": "^3.31.0"
+  }
 }

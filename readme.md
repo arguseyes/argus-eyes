@@ -16,7 +16,7 @@ argus-eyes compare develop feature/navigation # Compare 2 sets, save diff in '.a
 
 ## Installation
 1. Install [Node.js](http://nodejs.org/), at least v4.x
-2. Install [ImageMagick](http://www.imagemagick.org/)
+2. Install [ImageMagick](http://www.imagemagick.org/), expects the `compare` executable
 3. Install argus-eyes: `npm install argus-eyes -g`
 
 ## Usage
@@ -79,3 +79,6 @@ Use a different base directory for storing the screenshots and comparison result
 argus-eyes add develop --base==visual-regression
 argus-eyes compare develop feature/navigation --base==visual-regression
 ```
+
+### `--no-color`
+Turn off colored output. Out is colored by default.

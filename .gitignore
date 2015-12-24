@@ -1,3 +1,7 @@
+# Application
+argus-eyes.json
+.argus-eyes
+
 # Node.js
 node_modules
 *.log
