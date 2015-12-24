@@ -72,5 +72,5 @@ function mkdir(dir) {
  * @returns {String}
  */
 function plural(num) {
-    return num > 1 ? 's' : '';
+    return num === 1 ? '' : 's';
 }
