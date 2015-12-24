@@ -14,12 +14,18 @@ module.exports = function(config, id) {
     var success = true;
     var shots = 0;
 
+    log.message(util.format('Found %d page%s and %d component%s',
+        config.pages.length,
+        util.plural(config.pages.length),
+        config.components.length,
+        util.plural(config.components.length)));
+
     config.pages.forEach(function(page) {
         page.components.forEach(function(componentId) {
 
             var component = getComponent(config.components, componentId);
             if (!component) {
-                return log.error('Specified component not found: ' + componentId + ', expected in page \'' + page.name + '\'');
+                return log.error('Specified component not found: \'%s\', expected on page \'%s\'', componentId, page.name);
             }
 
             var base = config.base + '/' + id + '/' + page.name + '/';
@@ -45,7 +51,11 @@ module.exports = function(config, id) {
         });
     });
 
-    log.message(util.format('Saved %d screenshot%s in %s/%s', shots, util.plural(shots), config.base, id));
+    log.message(util.format('Saved %d screenshot%s in: %s/%s',
+        shots,
+        util.plural(shots),
+        path.relative(process.cwd(), config.base),
+        id));
 
     return success;
 };
