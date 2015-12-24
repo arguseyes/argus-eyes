@@ -37,7 +37,7 @@ differences were found, code -1 when differences were found.
 argus-eyes will look for a **`argus-eyes.json`** file in the current directory, it will fail without a config file.
 You can override this default location with the **`--config`** option.
 
-```
+```json
 {
   "pages": [
     {
