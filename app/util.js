@@ -45,7 +45,7 @@ function directoryExists(dir) {
  * Checks if a command is executable, and returns an exit code 0
  * @param {String} cmd
  * @param {String[]} args
- * @returns {boolean}
+ * @returns {Boolean}
  */
 function isExecutable(cmd, args) {
     try {
