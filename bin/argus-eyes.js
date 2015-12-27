@@ -19,7 +19,7 @@ global.log = require('../app/log')(config.color);
 log.success('argus-eyes - v' + pkg.version);
 
 // Test required cli arguments
-if (!config.components || !config.pages) {
+if (!config.pages || !config.components) {
     log.error('No config file found!');
     process.exit(-1);
 }
@@ -29,18 +29,16 @@ if (!action) {
 }
 
 // Test availability of ImageMagick
-if (!util.isExecutable('compare', ['-version'])) {
-    log.error('No ImageMagick found! Ensure the `compare` executable is in your PATH');
+if (!util.isExecutable('compare', ['-version']) || !util.isExecutable('identify', ['-version'])) {
+    log.error('ImageMagick not found! Ensure the `compare` and `identify` executables are in your PATH');
     process.exit(-1);
 }
 
 // Run action
-var exitCode;
 if (action[0] === 'add') {
-    exitCode = add(config, action[1]);
-} else if (action[0] === 'compare') {
-    exitCode = compare(config, action[1], action[2])
+    var success = add(config, action[1]);
+    process.exit(success ? 0 : -1);
 }
-
-// Report status with exitcode
-process.exit(exitCode ? 0 : -1);
+if (action[0] === 'compare') {
+    compare(config, action[1], action[2], success => process.exit(success ? 0 : -1));
+}

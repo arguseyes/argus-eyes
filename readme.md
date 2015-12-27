@@ -1,4 +1,6 @@
 # argus-eyes
+[![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
+
 A cli tool for taking and comparing screenshots, useful for visual regression testing. It uses [PhantomJS](http://phantomjs.org/)
 for taking the screenshots and [ImageMagick](http://www.imagemagick.org/) for comparing images and generating a visual diff.
 
@@ -21,7 +23,7 @@ argus-eyes compare develop feature/navigation    # Compare the 2 sets
 
 ## Installation
 1. Install [Node.js](http://nodejs.org/), at least v4.x
-2. Install [ImageMagick](http://www.imagemagick.org/), expects the `compare` executable in your `PATH`
+2. Install [ImageMagick](http://www.imagemagick.org/), expects the `compare` and `identify` executables in your `PATH`
 3. Install argus-eyes: `npm install argus-eyes -g`
 
 ## Usage
@@ -73,19 +75,30 @@ You can override this default location with the **`--config`** option.
 ```
 
 ## CLI Options
+Since the `add` and `compare` commands take positional arguments, all other options are expected last.
 
-### `--config`
+### `--config=...`
 Use a different config file. Defaults to **`'argus-eyes.json'`**
 ```
 argus-eyes add feature/navigation --config=config.json
 ```
 
-### `--base`
+### `--base=...`
 Use a different base directory for storing the screenshots and comparison results. Defaults to **`'.argus-eyes'`**
 ```
 argus-eyes add develop --base==visual-regression
 argus-eyes compare develop feature/navigation --base==visual-regression
 ```
+
+### `--threshold=...`
+Set the threshold for comparison. If the difference between 2 files is bigger than this number, it will be treated as
+different and reported as such.
+```
+argus-eyes compare develop feature/navigation --threshold=0.05
+```
+
+### `--verbose`
+Turn on verbose output.
 
 ### `--no-color`
 Turn off colored output. All output is colored by default.

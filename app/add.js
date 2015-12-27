@@ -9,10 +9,12 @@ var phantomjsPath = require('phantomjs').path;
  * @param {String} id - The identifier for this set of screenshots
  * @returns {Boolean}
  */
-module.exports = function(config, id) {
+module.exports = function add(config, id) {
 
     var success = true;
     var shots = 0;
+
+    id = id.replace('/', '-');
 
     log.message(util.format('Found %d page%s and %d component%s',
         config.pages.length,
@@ -20,12 +22,15 @@ module.exports = function(config, id) {
         config.components.length,
         util.plural(config.components.length)));
 
-    config.pages.forEach(function(page) {
-        page.components.forEach(function(componentId) {
+    config.pages.forEach(page => {
+        page.components.forEach(componentId => {
 
             var component = getComponent(config.components, componentId);
             if (!component) {
-                return log.error('Specified component not found: \'%s\', expected on page \'%s\'', componentId, page.name);
+                return log.error(util.format(
+                    'Specified component not found: \'%s\', expected on page \'%s\'',
+                    componentId,
+                    page.name));
             }
 
             var base = config.base + '/' + id + '/' + page.name + '/';
@@ -39,6 +44,9 @@ module.exports = function(config, id) {
                 '\'' + '1280x768' + '\'',
                 '\'' + component.selector + '\''
             ].join(' ');
+
+            log.verbose(config.verbose, 'Taking screenshot with PhantomJS for image: ' +
+                page.name + '/' + component.name + '.png');
 
             // Run PhantomJS and take screenshot
             try {
@@ -62,9 +70,9 @@ module.exports = function(config, id) {
 
 /**
  * Find a component by it's identifier
- * @param {{name: String}[]} components - The `components` list from the config object
+ * @param {{name: String, selector: String}[]} components - The `components` list from the config object
  * @param {String} componentId - The component identifier, the `name` property
- * @returns {{name: String, selector: String}[]}
+ * @returns {{name: String, selector: String} | Boolean}
  */
 function getComponent(components, componentId) {
     for (var i = 0; i < components.length; i++) {

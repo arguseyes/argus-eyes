@@ -7,8 +7,12 @@ var chalk = require('chalk');
 module.exports = function(color) {
     return {
         message: function(str) {
-            var colored = timestamp() + str;
-            console.log(color ? colored : chalk.stripColor(colored));
+            console.log(timestamp() + str);
+        },
+        verbose: function(output, str) {
+            if (output) {
+                console.log(timestamp() + str);
+            }
         },
         success: function(str) {
             var colored = timestamp() + chalk.green(str);

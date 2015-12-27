@@ -15,7 +15,9 @@ module.exports = {
 var defaultConfig = {
     config: process.cwd() + '/argus-eyes.json',
     base: process.cwd() + '/.argus-eyes',
-    color: true
+    verbose: false,
+    color: true,
+    threshold: 0.02
 };
 
 /**
@@ -36,8 +38,8 @@ function loadConfig(argv) {
     }
 
     // Merge config
-    config.components = configFile.components;
     config.pages = configFile.pages;
+    config.components = configFile.components;
 
     return config;
 }
@@ -53,6 +55,7 @@ function getConfiguration(argv) {
 
     if (argv.config) {
         if (!util.fileExists(argv.config)) {
+            console.log('Error: Specified config file not found!');
             process.exit(-1);
         }
         config.config = process.cwd() + '/' + argv.config;
@@ -60,6 +63,18 @@ function getConfiguration(argv) {
 
     if (argv.base && util.directoryExists(argv.base)) {
         config.base = argv.base;
+    }
+
+    if (argv.threshold) {
+        config.threshold = parseFloat(argv.threshold);
+        if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
+            console.log('Error: Incorrect threshold given!');
+            process.exit(-1);
+        }
+    }
+
+    if (argv.verbose === true) {
+        config.verbose = true;
     }
 
     if (argv.color === false) {
@@ -84,7 +99,7 @@ function getAction(argv) {
     // `argus-eyes compare develop current`
     var indexCompare = argv._.indexOf('compare');
     if (~indexCompare && argv._[indexCompare + 1] && argv._[indexCompare + 2]) {
-        return argv._.slice(indexCompare, indexAdd + 3);
+        return argv._.slice(indexCompare, indexCompare + 3);
     }
 
     return false;
