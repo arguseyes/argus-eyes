@@ -5,7 +5,7 @@ A cli tool for taking and comparing screenshots, useful for visual regression te
 for taking the screenshots and [ImageMagick](http://www.imagemagick.org/) for comparing images and generating a visual diff.
 
 It works by taking in a JSON config containing the list of pages with their url's and a list of components, defined by
-a CSS selector. It's possible to ignore area's per component by specifying a CSS selector.
+a css selector. It's possible to ignore area's per component by specifying a css selector.
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -68,7 +68,7 @@ You can override this default location with the **`--config`** option.
     {
       "name": "news-items",
       "selector": ".news-items",
-      "ignorearea": [
+      "ignore": [
         ".last-updated"
       ]
     }

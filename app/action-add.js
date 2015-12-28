@@ -50,7 +50,8 @@ module.exports = function add(config, id) {
                 '\'' + page.url + '\'',
                 '\'' + base + component.name + '.png' + '\'',
                 '\'' + '1280x768' + '\'',
-                '\'' + component.selector + '\''
+                '\'' + component.selector + '\'',
+                '\'' + (component.ignore ? JSON.stringify(component.ignore) : '[]') + '\''
             ].join(' ');
 
             log.verbose(config.verbose, 'Taking screenshot with PhantomJS for image: ' +
