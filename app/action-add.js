@@ -2,9 +2,12 @@ var util          = require('./util');
 var child_process = require('child_process');
 var path          = require('path');
 var phantomjsPath = require('phantomjs').path;
+var rimraf        = require('rimraf');
 
 /**
- * Take screenshots for all pages & components specified in `config`
+ * Action `add`
+ *  Takes screenshots for all pages & components specified in `config`
+ *
  * @param {{config: String, base: String, components: Array, pages: Array}} config
  * @param {String} id - The identifier for this set of screenshots
  * @returns {Boolean}
@@ -15,6 +18,11 @@ module.exports = function add(config, id) {
     var shots = 0;
 
     id = id.replace('/', '-');
+
+    var baseDir = config.base + '/' + id;
+    if (util.directoryExists(baseDir)) {
+        rimraf.sync(baseDir);
+    }
 
     log.message(util.format('Found %d page%s and %d component%s',
         config.pages.length,
@@ -33,7 +41,7 @@ module.exports = function add(config, id) {
                     page.name));
             }
 
-            var base = config.base + '/' + id + '/' + page.name + '/';
+            var base = baseDir + '/' + page.name + '/';
             util.mkdir(base + path.dirname(component.file));
 
             var command = [
@@ -70,6 +78,7 @@ module.exports = function add(config, id) {
 
 /**
  * Find a component by it's identifier
+ *
  * @param {{name: String, selector: String}[]} components - The `components` list from the config object
  * @param {String} componentId - The component identifier, the `name` property
  * @returns {{name: String, selector: String} | Boolean}

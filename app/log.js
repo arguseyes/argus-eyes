@@ -2,42 +2,35 @@ var chalk = require('chalk');
 
 /**
  * Construct log functions, preset with or without color highlighting
+ *
  * @param {Boolean} color
  */
 module.exports = function(color) {
     return {
         message: function(str) {
-            console.log(timestamp() + str);
+            log(false, str);
         },
         verbose: function(output, str) {
-            if (output) {
-                console.log(timestamp() + str);
-            }
+            if (output) log(color, chalk.gray('[verbose] ' + str));
         },
         success: function(str) {
-            var colored = timestamp() + chalk.green(str);
-            console.log(color ? colored : chalk.stripColor(colored));
+            log(color, chalk.green(str));
         },
         warning: function(str) {
-            var colored = timestamp() + chalk.yellow(str);
-            console.log(color ? colored : chalk.stripColor(colored));
+            log(color, chalk.yellow(str));
         },
         error: function(str) {
-            var colored = timestamp() + chalk.red(str);
-            console.log(color ? colored : chalk.stripColor(colored));
+            log(color, chalk.red(str));
         }
     };
 };
 
 /**
- * Makes a formatted time string, to be prefixed to console.log()
- * @returns {String}
+ * Log a message, either colored or not
+ *
+ * @param {Boolean} useColor - If this is false, color will be stripped from `coloredMessage`
+ * @param {String} coloredMessage
  */
-function timestamp() {
-    var now = new Date;
-    var pad = function(n) {
-        return ('00' + n).substr(-2, 2);
-    };
-    var time = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-    return '[' + chalk.grey(time) + '] ';
+function log(useColor, coloredMessage) {
+    console.log(useColor ? coloredMessage : chalk.stripColor(coloredMessage));
 }

@@ -17,6 +17,7 @@ module.exports = {
 
 /**
  * Checks if a path exists and is of the type 'file'
+ *
  * @param {String} file
  * @returns {Boolean}
  */
@@ -30,6 +31,7 @@ function fileExists(file) {
 
 /**
  * Checks if a path exists and is of the type 'directory'
+ *
  * @param {String} dir
  * @returns {Boolean}
  */
@@ -43,6 +45,7 @@ function directoryExists(dir) {
 
 /**
  * Checks if a command is executable, and returns an exit code 0
+ *
  * @param {String} cmd
  * @param {String[]} args
  * @returns {Boolean}
@@ -58,6 +61,7 @@ function isExecutable(cmd, args) {
 
 /**
  * Brute-force try to make a directory, ignoring a failure
+ *
  * @param {String} dir
  */
 function mkdir(dir) {
@@ -68,6 +72,7 @@ function mkdir(dir) {
 
 /**
  * Returns an empty string or a 's' character depending on whether it needs pluralization
+ *
  * @param {Number} num
  * @returns {String}
  */
