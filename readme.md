@@ -7,6 +7,7 @@ for taking the screenshots and [ImageMagick](http://www.imagemagick.org/) for co
 It works by taking in a JSON config containing the list of pages with their url's and a list of components, defined by
 a css selector. It's possible to ignore area's per component by specifying a css selector.
 
+- [Example](#example)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Config file](#config-file)
