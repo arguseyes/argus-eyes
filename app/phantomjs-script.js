@@ -2,7 +2,7 @@ var system = require('system');
 var page   = require('webpage').create();
 
 // Configuration
-var currentTries;
+var currentTries = 0;
 var maxTries = 20;
 var tryTimeout = 100;
 
@@ -32,12 +32,18 @@ page.open(url, function(status) {
         return phantom.exit(1);
     }
 
+    // Initalize script
+    waitForLoad();
+
     /**
      * Removes any ignored elements from the DOM
      *  Repeatedly invoked until it succeeds or maxTries is reached.
      */
-    currentTries = 0;
     function tryRemoveIgnores() {
+
+        if (!ignore.length) {
+            return tryClipRect();
+        }
 
         currentTries++;
 
@@ -60,7 +66,7 @@ page.open(url, function(status) {
             setTimeout(tryRemoveIgnores, tryTimeout);
         } else {
             console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + maxTries + ' tries.');
-            return phantom.exit(1);
+            phantom.exit(1);
         }
     }
 
@@ -94,7 +100,7 @@ page.open(url, function(status) {
             return setTimeout(tryClipRect, tryTimeout);
         } else {
             console.log('Unable to clip element \'' + sel + '\' at address: ' + url + ', timed out after ' + maxTries + ' tries.');
-            return phantom.exit(1);
+            phantom.exit(1);
         }
     }
 
@@ -112,14 +118,31 @@ page.open(url, function(status) {
             setTimeout(tryScreenshot, tryTimeout);
         } else {
             console.log('Unable to write file: \'' + file + '\', timed out after ' + maxTries + ' tries.');
-            return phantom.exit(1);
+            phantom.exit(1);
         }
     }
 
-    if (ignore.length) {
-        tryRemoveIgnores();
-    } else {
-        tryClipRect();
+    /**
+     * Wait for the ready state 'complete'
+     *  Repeatedly invoked until it succeeds or maxTries is reached.
+     */
+    function waitForLoad() {
+
+        currentTries++;
+
+        var readyState = page.evaluate(function() {
+            return document.readyState;
+        });
+
+        if (readyState === 'complete') {
+            currentTries = 0;
+            tryRemoveIgnores();
+        } else if (currentTries < maxTries) {
+            setTimeout(waitForLoad, tryTimeout);
+        } else {
+            console.log('document.readyState not \'completed\', timed out after ' + maxTries + ' tries.');
+            phantom.exit(1);
+        }
     }
 
 });
