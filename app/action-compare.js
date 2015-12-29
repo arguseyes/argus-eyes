@@ -36,6 +36,7 @@ module.exports = function compare(config, id1, id2, cb) {
     var count = dir1.length;
     var done = () => {
         if (--count === 0) { // are all async functions finished?
+            removeEmptyDirectories(diffDirectory);
             reportResults(diffDirectory, differences);
             cb(!!differences);
         }
@@ -157,6 +158,20 @@ function getImageSize(config, file) {
     } catch (e) {
         return false;
     }
+}
+
+/**
+ * Remove all empty directories within a path
+ * @param diffDirectory
+ */
+function removeEmptyDirectories(diffDirectory) {
+    glob.sync(diffDirectory + '/**').forEach(node => {
+        var isDir = util.directoryExists(node);
+        var isEmpty = glob.sync(node + '/**/*').length === 0;
+        if (isDir && isEmpty) {
+            fs.rmdir(node);
+        }
+    });
 }
 
 /**
