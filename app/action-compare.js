@@ -1,3 +1,4 @@
+var log           = require('./log');
 var util          = require('./util');
 var child_process = require('child_process');
 var fs            = require('fs');

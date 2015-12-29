@@ -1,3 +1,4 @@
+var log           = require('./log');
 var util          = require('./util');
 var child_process = require('child_process');
 var path          = require('path');
@@ -24,7 +25,7 @@ module.exports = function add(config, id) {
         rimraf.sync(baseDir);
     }
 
-    log.message(util.format('Found %d page%s and %d component%s',
+    log.verbose(config.verbose, util.format('Found %d page%s and %d component%s',
         config.pages.length,
         util.plural(config.pages.length),
         config.components.length,
@@ -68,7 +69,7 @@ module.exports = function add(config, id) {
         });
     });
 
-    log.message(util.format('Saved %d screenshot%s in: %s/%s',
+    log.success(util.format('Saved %d screenshot%s in: %s/%s',
         shots,
         util.plural(shots),
         path.relative(process.cwd(), config.base),

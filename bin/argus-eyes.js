@@ -4,6 +4,7 @@ process.title = 'argus-eyes';
 
 // Load dependencies
 var pkg           = require('../package');
+var log           = require('../app/log');
 var cfgLoader     = require('../app/configLoader');
 var util          = require('../app/util');
 var actionAdd     = require('../app/action-add');
@@ -13,9 +14,7 @@ var argv          = require('yargs').argv;
 // Initialize configuration
 var config = cfgLoader.loadConfig(argv);
 var action = cfgLoader.getAction(argv);
-
-// Initialize logger
-global.log = require('../app/log')(config.color);
+log.setColor(config.color);
 
 // Test given arguments and config for errors
 var configError = cfgLoader.getConfigError(config, action);
@@ -37,11 +36,11 @@ switch (action[0]) {
         break;
 
     case 'version':
-        log.message('v' + pkg.version);
+        log.info('v' + pkg.version);
         break;
 
     case 'help':
-        log.message(
+        log.info(
             '\nUsage:\n' +
             ' argus-eyes add <name>                Take new screenshots, save set as <name>\n' +
             ' argus-eyes compare <left> <right>    Compare 2 sets of screenshots by name\n' +
