@@ -1,3 +1,4 @@
+var cfgLoader     = require('./configLoader');
 var log           = require('./log');
 var util          = require('./util');
 var child_process = require('child_process');
@@ -9,12 +10,12 @@ var rimraf        = require('rimraf');
  * Action `add`
  *  Takes screenshots for all pages & components specified in `config`
  *
- * @param {{config: String, base: String, components: Array, pages: Array}} config
  * @param {String} id - The identifier for this set of screenshots
  * @returns {Boolean}
  */
-module.exports = function add(config, id) {
+module.exports = function add(id) {
 
+    var config = cfgLoader.getConfig();
     var success = true;
     var shots = 0;
 
@@ -25,7 +26,7 @@ module.exports = function add(config, id) {
         rimraf.sync(baseDir);
     }
 
-    log.verbose(config.verbose, util.format('Found %d page%s and %d component%s',
+    log.verbose(util.format('Found %d page%s and %d component%s',
         config.pages.length,
         util.plural(config.pages.length),
         config.components.length,
@@ -55,7 +56,7 @@ module.exports = function add(config, id) {
                 '\'' + (component.ignore ? JSON.stringify(component.ignore) : '[]') + '\''
             ].join(' ');
 
-            log.verbose(config.verbose, 'Taking screenshot with PhantomJS for image: ' +
+            log.verbose('Taking screenshot with PhantomJS for image: ' +
                 page.name + '/' + component.name + '.png');
 
             // Run PhantomJS and take screenshot
@@ -68,6 +69,8 @@ module.exports = function add(config, id) {
             }
         });
     });
+
+    util.removeEmptyDirectories(baseDir);
 
     log.success(util.format('Saved %d screenshot%s in: %s/%s',
         shots,

@@ -1,21 +1,23 @@
 var util = require('./util');
 var path = require('path');
+var argv = require('yargs').argv;
 
 /**
- * Expose module functions
- */
-module.exports = {
-    loadConfig,
-    getAction,
-    getConfigError
-};
-
-/**
- * The config object, as it is by default
+ * The action and positional arguments
  *
+ * @private
+ * @see _getAction()
+ * @type {String[]}
+ */
+var action = [];
+
+/**
+ * The config object, gets populated at runtime
+ *
+ * @private
  * @typedef {Object} Config
  */
-var defaultConfig = {
+var config = {
     config: process.cwd() + '/argus-eyes.json',
     base: process.cwd() + '/.argus-eyes',
     verbose: false,
@@ -25,45 +27,74 @@ var defaultConfig = {
 };
 
 /**
- * Construct configuration object
+ * Expose module functions
+ */
+module.exports = {
+    getConfig,
+    getAction,
+    loadConfig
+};
+
+/**
+ * Returns the config object
  *
- * @param {{config: String, base: String, _: Array}} argv - Yargs object
  * @returns {Config}
  */
-function loadConfig(argv) {
+function getConfig() {
+    return config;
+}
 
-    // Get config from cli arguments
-    var config = getConfiguration(argv);
+/**
+ * Returns the action object
+ *
+ * @returns {String[]}
+ */
+function getAction() {
+    return action;
+}
 
-    // Load config file
+/**
+ * Load config and action into the current state
+ *
+ * @throws {Error}
+ */
+function loadConfig() {
+
+    // Build config and action from cli input
+    config = _parseCliOptions(argv, config);
+    action = _parseCliPositionalArguments(argv);
+
+    // Attempt to load user config
     try {
-        var configFile = require(config.config);
+        var userConfig = require(config.config);
     } catch (e) {
-        return config;
+        throw new Error(util.format("Could not load config file '%s' (Incorrect JSON?): ", config.config));
     }
 
-    // Merge config
-    config.pages = configFile.pages;
-    config.components = configFile.components;
-
-    return config;
+    // Merge loaded config file into config object
+    config.pages = userConfig.pages;
+    config.components = userConfig.components;
 }
 
 /**
  * Determine configuration options given via cli arguments
  *
+ * @private
  * @param {Object} argv - Yargs object
- * @returns {Config}
+ * @param {Config} config - The config object to merge new options into
+ * @throws {Error}
+ * @returns {Config} - The final config
  */
-function getConfiguration(argv) {
-
-    var config = defaultConfig;
+function _parseCliOptions(argv, config) {
 
     if (argv.config) {
         if (path.isAbsolute(argv.config)) {
             config.config = argv.config;
         } else {
             config.config = process.cwd() + '/' + argv.config;
+        }
+        if (!util.fileExists(config.config)) {
+            throw new Error('Config file not found: ' + config.config);
         }
     }
 
@@ -85,10 +116,22 @@ function getConfiguration(argv) {
 
     if (argv.threshold) {
         config.threshold = parseFloat(argv.threshold);
+        if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
+            throw new Error('Incorrect threshold given');
+        }
     }
 
     if (argv.im) {
         config.im = argv.im;
+    }
+    var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
+    var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
+    if (!imCompare && !imIdentify) {
+        return new Error('ImageMagick executables not found');
+    } else if (!imCompare) {
+        return new Error('ImageMagick executable not found: `compare`');
+    } else if (!imIdentify) {
+        return new Error('ImageMagick executable not found: `identify`');
     }
 
     return config;
@@ -97,9 +140,12 @@ function getConfiguration(argv) {
 /**
  * Determines the action
  *
- * @returns {String[]}
+ * @private
+ * @param {Object} argv - Yargs object
+ * @throws {Error}
+ * @returns {String[]} - The final action
  */
-function getAction(argv) {
+function _parseCliPositionalArguments(argv) {
 
     // yargs positional arguments
     var posArgs = argv._;
@@ -111,6 +157,15 @@ function getAction(argv) {
 
     // `argus-eyes compare develop current`
     if (posArgs.length === 3 && posArgs[0] === 'compare') {
+        if (posArgs[1] === posArgs[2]) {
+            throw new Error('You cannot compare a set with itself');
+        }
+        if (!util.directoryExists(config.base + '/' + posArgs[1])) {
+            throw new Error(util.format("Left side not found: '%s'", posArgs[1]));
+        }
+        if (!util.directoryExists(config.base + '/' + posArgs[2])) {
+            throw new Error(util.format("Right side not found: '%s'", posArgs[2]));
+        }
         return ['compare', posArgs[1], posArgs[2]];
     }
 
@@ -124,55 +179,5 @@ function getAction(argv) {
         return ['version'];
     }
 
-    return [];
-}
-
-/**
- * Tests whether the given config & action are usable
- *
- * @param {Config} config
- * @param {String[]} action
- * @returns {Error | Boolean}
- */
-function getConfigError(config, action) {
-
-    if (action[0] === 'compare' && action[1] === action[2]) {
-        return new Error('You cannot compare a set with itself');
-    }
-
-    if (action[0] === 'compare' && !util.directoryExists(config.base + '/' + action[1])) {
-        return new Error(util.format("Left side not found: '%s'", action[1]));
-    }
-
-    if (action[0] === 'compare' && !util.directoryExists(config.base + '/' + action[2])) {
-        return new Error(util.format("Right side not found: '%s'", action[2]));
-    }
-
-    if (!util.fileExists(config.config)) {
-        return new Error('Config file not found: ' + config.config);
-    }
-
-    if (!config.pages || !config.components) {
-        return new Error('Incorrect config file format: ' + config.config);
-    }
-
-    if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
-        return new Error('Incorrect threshold given');
-    }
-
-    if (!action.length) {
-        return new Error('No valid action found. Run with --help to print usage information');
-    }
-
-    var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
-    var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
-    if (!imCompare && !imIdentify) {
-        return new Error('ImageMagick executables not found');
-    } else if (!imCompare) {
-        return new Error('ImageMagick executable not found: `compare`');
-    } else if (!imIdentify) {
-        return new Error('ImageMagick executable not found: `identify`');
-    }
-
-    return false;
+    throw new Error('No valid action found. Run with --help to print usage information');
 }

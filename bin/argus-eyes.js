@@ -9,30 +9,26 @@ var cfgLoader     = require('../app/configLoader');
 var util          = require('../app/util');
 var actionAdd     = require('../app/action-add');
 var actionCompare = require('../app/action-compare');
-var argv          = require('yargs').argv;
 
 // Initialize configuration
-var config = cfgLoader.loadConfig(argv);
-var action = cfgLoader.getAction(argv);
-log.setColor(config.color);
-
-// Test given arguments and config for errors
-var configError = cfgLoader.getConfigError(config, action);
-if (configError instanceof Error) {
-    log.error('Error: ' + configError.message);
+try {
+    cfgLoader.loadConfig();
+} catch (e) {
+    log.error('Error: ' + e.message);
     process.exit(1);
 }
 
 // Run action
+var action = cfgLoader.getAction();
 switch (action[0]) {
 
     case 'add':
-        var success = actionAdd(config, action[1]);
+        var success = actionAdd(action[1]);
         process.exit(success ? 0 : 1);
         break;
 
     case 'compare':
-        actionCompare(config, action[1], action[2], success => process.exit(success ? 0 : 1));
+        actionCompare(action[1], action[2], success => process.exit(success ? 0 : 1));
         break;
 
     case 'version':

@@ -1,6 +1,6 @@
 {
   "name": "argus-eyes",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A cli tool for taking and comparing screenshots, useful for visual regression testing",
   "main": "bin/argus-eyes.js",
   "bin": {
@@ -21,6 +21,7 @@
     "regression",
     "testing",
     "phantomjs",
+    "phantomcss",
     "imagemagick"
   ],
   "author": "Bran van der Meer <branmovic@gmail.com> (http://bran.name/)",

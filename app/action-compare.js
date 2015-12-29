@@ -1,3 +1,4 @@
+var cfgLoader     = require('./configLoader');
 var log           = require('./log');
 var util          = require('./util');
 var child_process = require('child_process');
@@ -10,13 +11,14 @@ var rimraf        = require('rimraf');
  * Action `compare`
  *  Compares left and right sets of screenshots, reporting any difference
  *
- * @param {{config: String, base: String, components: Array, pages: Array}} config
  * @param {String} id1 - Left set of screenshots
  * @param {String} id2 - Right set of screenshots
  * @param {Function} cb - Callback, invoked when finished
  * @return {Boolean}
  */
-module.exports = function compare(config, id1, id2, cb) {
+module.exports = function compare(id1, id2, cb) {
+
+    var config = cfgLoader.getConfig();
 
     id1 = id1.replace('/', '-');
     id2 = id2.replace('/', '-');
@@ -31,13 +33,13 @@ module.exports = function compare(config, id1, id2, cb) {
     }
     util.mkdir(diffDirectory);
 
-    showDirectoryDifferenceWarnings(config, dir1, dir2, id1, id2);
+    showDirectoryDifferenceWarnings(dir1, dir2, id1, id2);
 
     var differences = 0;
     var count = dir1.length;
     var done = () => {
         if (--count === 0) { // are all async functions finished?
-            removeEmptyDirectories(diffDirectory);
+            util.removeEmptyDirectories(diffDirectory);
             reportResults(diffDirectory, differences);
             cb(!!differences);
         }
@@ -82,21 +84,21 @@ module.exports = function compare(config, id1, id2, cb) {
             // Report when verbose and remove diff image when necessary
             if (pixelsChanged > 0 && percentage > config.threshold) {
                 differences++;
-                log.verbose(config.verbose, util.format(
+                log.verbose(util.format(
                     "Difference (%d%) above threshold (%d%) found for: '%s'",
                     percentage.toFixed(2),
                     config.threshold,
                     filename));
             } else if (pixelsChanged > 0) {
                 fs.unlinkSync(diffFile);
-                log.verbose(config.verbose, util.format(
+                log.verbose(util.format(
                     "Difference (%d%) not bigger than threshold (%d%) for: '%s'",
                     percentage.toFixed(2),
                     config.threshold,
                     filename));
             } else {
                 fs.unlinkSync(diffFile);
-                log.verbose(config.verbose, util.format("Found exactly equal: '%s'", filename));
+                log.verbose(util.format("Found exactly equal: '%s'", filename));
             }
 
             return done();
@@ -108,18 +110,17 @@ module.exports = function compare(config, id1, id2, cb) {
 /**
  * Show warnings for non-existing files in either comparison directory
  *
- * @param {Config} config
  * @param {String[]} dir1 - List of files in the left directory
  * @param {String[]} dir2 - List of files in the right directory
  * @param {String} id1 - Identifier of the left directory
  * @param {String} id2 - Identifier of the right directory
  */
-function showDirectoryDifferenceWarnings(config, dir1, dir2, id1, id2) {
-    log.verbose(config.verbose, util.format(
+function showDirectoryDifferenceWarnings(dir1, dir2, id1, id2) {
+    log.verbose(util.format(
         'Found a total of %d screenshot%s on the left side',
         dir1.length,
         util.plural(dir1.length)));
-    log.verbose(config.verbose, util.format(
+    log.verbose(util.format(
         'Found a total of %d screenshot%s on the right side',
         dir2.length,
         util.plural(dir2.length)));
@@ -159,20 +160,6 @@ function getImageSize(config, file) {
     } catch (e) {
         return false;
     }
-}
-
-/**
- * Remove all empty directories within a path
- * @param diffDirectory
- */
-function removeEmptyDirectories(diffDirectory) {
-    glob.sync(diffDirectory + '/**').forEach(node => {
-        var isDir = util.directoryExists(node);
-        var isEmpty = glob.sync(node + '/**/*').length === 0;
-        if (isDir && isEmpty) {
-            fs.rmdir(node);
-        }
-    });
 }
 
 /**

@@ -1,27 +1,16 @@
-var chalk = require('chalk');
-
-var useColor = false;
+var cfgLoader = require('./configLoader');
+var chalk     = require('chalk');
 
 /**
  * Expose module functions
  */
 module.exports = {
-    setColor,
     info,
     success,
     warning,
     error,
     verbose
 };
-
-/**
- * Set the color for all logging from now on
- *
- * @param {Boolean} color
- */
-function setColor(color) {
-    useColor = !!color;
-}
 
 /**
  * Information logging level
@@ -33,13 +22,12 @@ function info(msg) {
 }
 
 /**
- * Verbose logging level
+ * Verbose logging level, only outputs when config.verbose is `true`
  *
- * @param {Boolean} output - Only output `str` if this is `true`
  * @param {String} msg
  */
-function verbose(output, msg) {
-    if (output) {
+function verbose(msg) {
+    if (cfgLoader.getConfig().verbose) {
         _log(chalk.gray('[verbose] ' + msg));
     }
 }
@@ -78,5 +66,6 @@ function error(msg) {
  * @param {String} coloredMessage
  */
 function _log(coloredMessage) {
+    var useColor = cfgLoader.getConfig().color;
     console.log(useColor ? coloredMessage : chalk.stripColor(coloredMessage));
 }

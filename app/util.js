@@ -1,6 +1,7 @@
+var child_process = require('child_process');
 var fs            = require('fs');
 var util          = require('util');
-var child_process = require('child_process');
+var glob          = require('glob');
 var mkdirp        = require('mkdirp');
 
 /**
@@ -11,6 +12,7 @@ module.exports = {
     directoryExists,
     isExecutable,
     mkdir,
+    removeEmptyDirectories,
     format: util.format,
     plural
 };
@@ -68,6 +70,20 @@ function mkdir(dir) {
     try {
         mkdirp.sync(dir);
     } catch (e) {}
+}
+
+/**
+ * Remove all empty directories within a path
+ * @param {String} dir
+ */
+function removeEmptyDirectories(dir) {
+    glob.sync(dir + '/**').forEach(node => {
+        var isDir = directoryExists(node);
+        var isEmpty = glob.sync(node + '/**/*').length === 0;
+        if (isDir && isEmpty) {
+            fs.rmdir(node);
+        }
+    });
 }
 
 /**
