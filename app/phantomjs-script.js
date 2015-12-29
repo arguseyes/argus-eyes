@@ -45,7 +45,7 @@ page.open(url, function(status) {
             try {
                 ignore.forEach(function(selector) {
                     var element = document.querySelector(baseSelector + ' ' + selector);
-                    element.parentNode.removeChild(element);
+                    element.style.display = 'none';
                 });
                 return true;
             } catch (e) {
