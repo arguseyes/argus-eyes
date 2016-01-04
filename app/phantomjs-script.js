@@ -1,10 +1,16 @@
+// 10s timeout on this script
+setTimeout(function() {
+    return phantom.exit(1);
+}, 10 * 1000);
+
+// PhantomJS API
 var system = require('system');
 var page   = require('webpage').create();
 
 // Configuration
 var currentTries = 0;
-var maxTries = 20;
-var tryTimeout = 100;
+var maxTries     = 20;
+var tryTimeout   = 100;
 
 // CLI Arguments
 var url    = system.args[1];
