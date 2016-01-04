@@ -8,6 +8,7 @@ var mkdirp        = require('mkdirp');
  * Expose module functions
  */
 module.exports = {
+    escape,
     fileExists,
     directoryExists,
     isExecutable,
@@ -16,6 +17,16 @@ module.exports = {
     format: util.format,
     plural
 };
+
+/**
+ * Escape double quotes
+ *
+ * @param {String} str
+ * @returns {String}
+ */
+function escape(str) {
+    return str.replace(/"/g, '\\"');
+}
 
 /**
  * Checks if a path exists and is of the type 'file'

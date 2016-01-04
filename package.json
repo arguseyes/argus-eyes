@@ -1,6 +1,6 @@
 {
   "name": "argus-eyes",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "A cli tool for taking and comparing screenshots, useful for visual regression testing",
   "main": "bin/argus-eyes.js",
   "bin": {

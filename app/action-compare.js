@@ -52,8 +52,8 @@ module.exports = function compare(id1, id2, cb) {
 
         util.mkdir(path.dirname(diffFile));
 
-        var sizes1 = getImageSize(config, file1);
-        var sizes2 = getImageSize(config, file2);
+        var sizes1 = getImageSize(file1);
+        var sizes2 = getImageSize(file2);
         if (!sizes1 || !sizes2) {
             log.error('Could not probe both left and right for image dimensions: ' + filename);
             return done();
@@ -77,7 +77,11 @@ module.exports = function compare(id1, id2, cb) {
         }
 
         // Execute imagemagick `compare` command
-        var command = util.format("'%s' '%s' '%s' -metric AE '%s'", config.im + 'compare', file1, file2, diffFile);
+        var command = util.format('"%s" "%s" "%s" -metric AE "%s"',
+            util.escape(config.im + 'compare'),
+            util.escape(file1),
+            util.escape(file2),
+            util.escape(diffFile));
         child_process.exec(command, (err, stdout, stderr) => {
 
             // Remove temporary image
@@ -164,12 +168,18 @@ function getDirectoryDiff(dir, id1, id2, cb) {
 /**
  * Returns the dimensions of an image file
  *
- * @param {Config} config
  * @param {String} file - The full path to an image file
  * @returns {[Number, Number] | Boolean}
  */
-function getImageSize(config, file) {
-    var command = util.format("'%s' -ping -format '%w %h' '%s'", config.im + 'identify', file);
+function getImageSize(file) {
+
+    var config = cfgLoader.getConfig();
+
+    var command = util.format(
+        '"%s" -ping -format "%w %h" "%s"',
+        util.escape(config.im + 'identify'),
+        util.escape(file));
+
     try {
         var sizes = child_process.execSync(command, { encoding: 'utf8' });
         return sizes.trim().split(' ').map(num => parseInt(num, 10));
@@ -206,8 +216,11 @@ function resizeTo(file, sizes) {
     log.verbose("Resizing '" + path.relative(process.cwd(), file) + "' to " + newSizes);
 
     var command = util.format(
-        "'%s' '%s' -background transparent -extent %s '%s'",
-        imConvert, file, newSizes, newName);
+        '"%s" "%s" -background transparent -extent %s "%s"',
+        util.escape(imConvert),
+        util.escape(file),
+        newSizes,
+        util.escape(newName));
     child_process.execSync(command);
 
     return newName;

@@ -43,13 +43,13 @@ module.exports = function add(id) {
             util.mkdir(base + path.dirname(component.file));
 
             var command = [
-                '\'' + phantomjsPath + '\'',
-                '\'' + __dirname + '/phantomjs-script.js' + '\'',
-                '\'' + page.url + '\'',
-                '\'' + base + component.name + '.png' + '\'',
-                '\'' + '1280x768' + '\'',
-                '\'' + component.selector + '\'',
-                '\'' + (component.ignore ? JSON.stringify(component.ignore) : '[]') + '\''
+                '"' + util.escape(phantomjsPath) + '"',
+                '"' + util.escape(__dirname + '/phantomjs-script.js') + '"',
+                '"' + util.escape(page.url) + '"',
+                '"' + util.escape(base + component.name + '.png') + '"',
+                '"' + util.escape('1280x768') + '"',
+                '"' + util.escape(component.selector) + '"',
+                '"' + util.escape(component.ignore ? JSON.stringify(component.ignore) : '[]') + '"'
             ].join(' ');
 
             log.verbose('Taking screenshot with PhantomJS for image: ' +
