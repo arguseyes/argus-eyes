@@ -76,9 +76,9 @@ If any differences were found, the visual diff images are stored in: **`.argus-e
 ## Usage
 
 ### `argus-eyes add <name>`
-Run argus-eyes and save all the screenshots under **`.argus-eyes/develop/`**
+Run argus-eyes and save all the screenshots under **`.argus-eyes/<name>/`**
 
-### `argus-eyes compare <name1> <name2>`
+### `argus-eyes compare <left> <right>`
 Compare left and right sets of screenshots, reporting any difference. Process will exit with code 0 when no significant
 differences were found, code 1 when differences were found.
 
