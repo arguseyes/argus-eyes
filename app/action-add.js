@@ -33,13 +33,11 @@ module.exports = function add(id) {
     config.pages.forEach(page => {
         page.components.forEach(componentId => {
 
-            var component = getComponent(config.components, componentId);
-            if (!component) {
-                return log.error(util.format(
-                    'Specified component not found: \'%s\', expected on page \'%s\'',
-                    componentId,
-                    page.name));
-            }
+            var component = config.components.find(component => {
+                if (component.name === componentId) {
+                    return component;
+                }
+            });
 
             var base = baseDir + '/' + page.name + '/';
             util.mkdir(base + path.dirname(component.file));
@@ -78,19 +76,3 @@ module.exports = function add(id) {
 
     return success;
 };
-
-/**
- * Find a component by it's identifier
- *
- * @param {{name: String, selector: String}[]} components - The `components` list from the config object
- * @param {String} componentId - The component identifier, the `name` property
- * @returns {{name: String, selector: String} | Boolean}
- */
-function getComponent(components, componentId) {
-    for (var i = 0; i < components.length; i++) {
-        if (components[i].name === componentId) {
-            return components[i];
-        }
-    }
-    return false;
-}
