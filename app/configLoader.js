@@ -15,7 +15,16 @@ var action = [];
  * The config object, gets populated at runtime
  *
  * @private
- * @typedef {Object} Config
+ * @typedef {{
+ *   config: String,
+ *   base: String,
+ *   verbose: Boolean,
+ *   color: Boolean,
+ *   threshold: Number,
+ *   im: String,
+ *   pages: { name: String, url: String, components: String[] }[],
+ *   components: { name: String, selector: String, ignore: String[] }[]
+ * }} Config
  */
 var config = {
     config: process.cwd() + '/argus-eyes.json',
@@ -23,7 +32,9 @@ var config = {
     verbose: false,
     color: true,
     threshold: 2,
-    im: ''
+    im: '',
+    pages: [],
+    components: []
 };
 
 /**
@@ -72,8 +83,7 @@ function loadConfig() {
     }
 
     // Merge loaded config file into config object
-    config.pages = userConfig.pages;
-    config.components = userConfig.components;
+    config = _mergeConfig(config, userConfig);
 }
 
 /**
@@ -125,16 +135,16 @@ function _parseCliOptions(argv, config) {
         config.im = argv.im;
     }
     var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
-    var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
     var imConvert  = util.isExecutable(config.im + 'convert', ['-version']);
-    if (!imCompare && !imIdentify && !imConvert) {
-        return new Error('ImageMagick executables not found');
+    var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
+    if (!imCompare && !imConvert && !imIdentify) {
+        throw new Error('ImageMagick executables not found');
     } else if (!imCompare) {
-        return new Error('ImageMagick executable not found: `compare`');
-    } else if (!imIdentify) {
-        return new Error('ImageMagick executable not found: `identify`');
+        throw new Error('ImageMagick executable not found: `compare`');
     } else if (!imConvert) {
-        return new Error('ImageMagick executable not found: `convert`');
+        throw new Error('ImageMagick executable not found: `convert`');
+    } else if (!imIdentify) {
+        throw new Error('ImageMagick executable not found: `identify`');
     }
 
     return config;
@@ -153,13 +163,13 @@ function _parseCliPositionalArguments(argv) {
     // yargs positional arguments
     var posArgs = argv._;
 
-    // `argus-eyes add develop`
+    // `argus-eyes add <name>`
     if (posArgs.length === 2 && posArgs[0] === 'add') {
         posArgs[1] = posArgs[1].replace('/', '-');
         return ['add', posArgs[1]];
     }
 
-    // `argus-eyes compare develop current`
+    // `argus-eyes compare <name1> <name2>`
     if (posArgs.length === 3 && posArgs[0] === 'compare') {
         posArgs[1] = posArgs[1].replace('/', '-');
         posArgs[2] = posArgs[2].replace('/', '-');
@@ -186,4 +196,63 @@ function _parseCliPositionalArguments(argv) {
     }
 
     throw new Error('No valid action found. Run with --help to print usage information');
+}
+
+/**
+ * Merge user config into app config object
+ *
+ * @private
+ * @param {Config} config
+ * @param {{
+ *   pages: { name: String, url: String, components: String[] }[],
+ *   components: { name: String, selector: String, ignore: String[] }[]
+ * }} userConfig
+ * @throws {Error}
+ * @returns {Config}
+ */
+function _mergeConfig(config, userConfig) {
+
+    // Validate pages and components arrays
+    if (!Array.isArray(userConfig.pages) || userConfig.pages.length < 1) {
+        throw new Error('Config: No pages found!');
+    }
+    if (!Array.isArray(userConfig.components) || userConfig.components.length < 1) {
+        throw new Error('Config: No components found!');
+    }
+
+    // Validate pages
+    userConfig.pages.forEach(page => {
+        if (!page.name || typeof page.name !== 'string' || !page.url || typeof page.url !== 'string') {
+            throw new Error('Config: All pages need a name and url!');
+        }
+        if (!Array.isArray(page.components) || !page.components.length) {
+            throw new Error(util.format("Config: Page '%s' needs at least 1 component!", page.name));
+        }
+    });
+
+    // Validate components
+    userConfig.components.forEach(component => {
+        if (!component.name || typeof component.name !== 'string' || !component.selector || typeof component.selector !== 'string') {
+            throw new Error('Config: All components need a name and selector!');
+        }
+        if (typeof component.ignore !== 'undefined' && (!Array.isArray(component.ignore) || !component.ignore.length)) {
+            throw new Error(util.format("Config: Component '%s' has an invalid ignore list!", component.name));
+        }
+    });
+
+    // Validate all referenced components actually exist
+    var components = userConfig.components.map(c => c.name);
+    userConfig.pages.forEach(page => {
+        page.components.forEach(component => {
+            if (!~components.indexOf(component)) {
+                throw new Error(util.format("Config: Component '%s' not found in page '%s'", component, page.name));
+            }
+        });
+    });
+
+    // Manually merge objects
+    config.pages = userConfig.pages;
+    config.components = userConfig.components;
+
+    return config;
 }
