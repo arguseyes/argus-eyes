@@ -19,8 +19,6 @@ module.exports = function add(id) {
     var success = true;
     var shots = 0;
 
-    id = id.replace('/', '-');
-
     var baseDir = config.base + '/' + id;
     if (util.directoryExists(baseDir)) {
         rimraf.sync(baseDir);

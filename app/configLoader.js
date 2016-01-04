@@ -155,11 +155,14 @@ function _parseCliPositionalArguments(argv) {
 
     // `argus-eyes add develop`
     if (posArgs.length === 2 && posArgs[0] === 'add') {
+        posArgs[1] = posArgs[1].replace('/', '-');
         return ['add', posArgs[1]];
     }
 
     // `argus-eyes compare develop current`
     if (posArgs.length === 3 && posArgs[0] === 'compare') {
+        posArgs[1] = posArgs[1].replace('/', '-');
+        posArgs[2] = posArgs[2].replace('/', '-');
         if (posArgs[1] === posArgs[2]) {
             throw new Error('You cannot compare a set with itself');
         }

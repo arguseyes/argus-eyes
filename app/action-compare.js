@@ -20,9 +20,6 @@ module.exports = function compare(id1, id2, cb) {
 
     var config = cfgLoader.getConfig();
 
-    id1 = id1.replace('/', '-');
-    id2 = id2.replace('/', '-');
-
     var diffDirectory = config.base + '/diff_' + id1 + '_' + id2;
     var dir1 = glob.sync(config.base + '/' + id1 + '/**/*.png');
     var dir2 = glob.sync(config.base + '/' + id2 + '/**/*.png');
