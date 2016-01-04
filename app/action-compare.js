@@ -35,6 +35,7 @@ module.exports = function compare(id1, id2, cb) {
 
     showDirectoryDifferenceWarnings(dir1, dir2, id1, id2);
 
+    // Asynchronous "is-everything-finished?" method
     var differences = 0;
     var count = dir1.length;
     var done = () => {
@@ -60,14 +61,32 @@ module.exports = function compare(id1, id2, cb) {
             log.error('Could not probe both left and right for image dimensions: ' + filename);
             return done();
         }
+
+        // Resize image if it's smaller
+        var fileResized = false;
         if (sizes1[0] !== sizes2[0] || sizes1[1] !== sizes2[1]) {
-            differences++;
-            log.warning('Image dimensions differ left and right: ' + filename);
-            return done();
+            log.verbose('Image dimensions differ left and right: ' + filename);
+            try {
+                if (isSmallest(sizes1, sizes2)) {
+                    fileResized = file1 = resizeTo(file1, sizes2);
+                } else {
+                    fileResized = file2 = resizeTo(file2, sizes1);
+                }
+            } catch (e) {
+                differences++;
+                log.error('Could not resize smaller image: ' + filename);
+                return done();
+            }
         }
 
+        // Execute imagemagick `compare` command
         var command = util.format("'%s' '%s' '%s' -metric AE '%s'", config.im + 'compare', file1, file2, diffFile);
         child_process.exec(command, (err, stdout, stderr) => {
+
+            // Remove temporary image
+            if (fileResized && util.fileExists(fileResized)) {
+                fs.unlinkSync(fileResized);
+            }
 
             // `compare` exit code 0 means equal, 1 means different, all else is an error
             if (err instanceof Error && err.code !== 0 && err.code !== 1) {
@@ -137,7 +156,7 @@ function showDirectoryDifferenceWarnings(dir1, dir2, id1, id2) {
  * @param {Function} cb - Callback for each difference, passed a single argument, the file
  */
 function getDirectoryDiff(dir, id1, id2, cb) {
-    dir.forEach(function(file1) {
+    dir.forEach(file1 => {
         var file2 = file1.replace(id1, id2);
         if (!util.fileExists(file2)) {
             cb(file2);
@@ -160,6 +179,41 @@ function getImageSize(config, file) {
     } catch (e) {
         return false;
     }
+}
+
+/**
+ * Is `file1` smaller than `file2` in image dimensions?
+ *
+ * @param {[Number, Number]} sizes1 - Dimensions of the left file
+ * @param {[Number, Number]} sizes2 - Dimensions of the right file
+ * @returns {Boolean}
+ */
+function isSmallest(sizes1, sizes2) {
+    return (sizes1[0] * sizes1[1]) < (sizes2[0] * sizes2[1]);
+}
+
+/**
+ * Resize an image to specified dimensions
+ *
+ * @param {String} file - Left filename
+ * @param {[Number, Number]} sizes - Dimensions of the left file
+ * @throws {Error}
+ * @returns {String} - The filename of the just created file
+ */
+function resizeTo(file, sizes) {
+
+    var imConvert = cfgLoader.getConfig().im + 'convert';
+    var newName   = file + '.tmp.png';
+    var newSizes  = sizes[0] + 'x' + sizes[1];
+
+    log.verbose("Resizing '" + path.relative(process.cwd(), file) + "' to " + newSizes);
+
+    var command = util.format(
+        "'%s' '%s' -background transparent -extent %s '%s'",
+        imConvert, file, newSizes, newName);
+    child_process.execSync(command);
+
+    return newName;
 }
 
 /**

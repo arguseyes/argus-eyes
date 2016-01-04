@@ -126,12 +126,15 @@ function _parseCliOptions(argv, config) {
     }
     var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
     var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
-    if (!imCompare && !imIdentify) {
+    var imConvert  = util.isExecutable(config.im + 'convert', ['-version']);
+    if (!imCompare && !imIdentify && !imConvert) {
         return new Error('ImageMagick executables not found');
     } else if (!imCompare) {
         return new Error('ImageMagick executable not found: `compare`');
     } else if (!imIdentify) {
         return new Error('ImageMagick executable not found: `identify`');
+    } else if (!imConvert) {
+        return new Error('ImageMagick executable not found: `convert`');
     }
 
     return config;
