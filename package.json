@@ -1,7 +1,7 @@
 {
   "name": "argus-eyes",
   "version": "0.3.5",
-  "description": "A cli tool for taking and comparing screenshots, useful for visual regression testing",
+  "description": "A lightweight commandline tool for visual regression testing of UI components.",
   "main": "bin/argus-eyes.js",
   "bin": {
     "argus-eyes": "bin/argus-eyes.js"
