@@ -36,10 +36,10 @@
   "homepage": "https://github.com/branneman/argus-eyes#readme",
   "dependencies": {
     "chalk": "^1.1.1",
-    "glob": "^6.0.2",
+    "glob": "^6.0.4",
     "mkdirp": "^0.5.1",
     "phantomjs": "^1.9.19",
     "rimraf": "^2.5.0",
-    "yargs": "^3.31.0"
+    "yargs": "^3.32.0"
   }
 }
