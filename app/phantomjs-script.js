@@ -94,14 +94,19 @@ page.open(url, function(status) {
         }, sel);
 
         if (clipRect) {
-            page.clipRect = {
-                top:    clipRect.top,
-                left:   clipRect.left,
-                width:  clipRect.width,
-                height: clipRect.height
-            };
-            currentTries = 0;
-            tryScreenshot();
+            if (clipRect.width > 0 && clipRect.height > 0) {
+                page.clipRect = {
+                    top:    clipRect.top,
+                    left:   clipRect.left,
+                    width:  clipRect.width,
+                    height: clipRect.height
+                };
+                currentTries = 0;
+                tryScreenshot();
+            } else {
+                console.log('Element hidden: \'' + sel + '\', skipping screenshot.');
+                phantom.exit();
+            }
         } else if (currentTries < maxTries) {
             return setTimeout(tryClipRect, tryTimeout);
         } else {

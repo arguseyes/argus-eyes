@@ -15,54 +15,73 @@ var rimraf        = require('rimraf');
  */
 module.exports = function add(id) {
 
-    var config = cfgLoader.getConfig();
+    var config  = cfgLoader.getConfig();
     var success = true;
-    var shots = 0;
+    var shots   = 0;
 
     var baseDir = config.base + '/' + id;
     if (util.directoryExists(baseDir)) {
         rimraf.sync(baseDir);
     }
 
-    log.verbose(util.format('Found %d page%s and %d component%s',
+    log.verbose(util.format('Found %d size%s, %d page%s and %d component%s',
+        config.sizes.length,
+        util.plural(config.sizes.length),
         config.pages.length,
         util.plural(config.pages.length),
         config.components.length,
         util.plural(config.components.length)));
 
-    config.pages.forEach(page => {
-        page.components.forEach(componentId => {
+    config.sizes.forEach(size => {
+        config.pages.forEach(page => {
+            page.components.forEach(componentId => {
 
-            var component = config.components.find(component => {
-                if (component.name === componentId) {
-                    return component;
+                var component = config.components.find(component => {
+                    if (component.name === componentId) {
+                        return component;
+                    }
+                });
+
+                var base = baseDir + '/' + size + '/' + page.name;
+                var file = base + '/' + component.name + '.png';
+                util.mkdir(base);
+
+                log.verbose(util.format("Taking screenshot with PhantomJS for image: '%s'",
+                    path.relative(baseDir, file)));
+
+                // Run PhantomJS and take screenshot
+                try {
+                    var args = [
+                        __dirname + '/phantomjs-script.js',
+                        page.url,
+                        file,
+                        size,
+                        component.selector,
+                        component.ignore ? JSON.stringify(component.ignore) : '[]'
+                    ];
+                    var proc = child_process.spawnSync(phantomjsPath, args, { encoding: 'utf8' });
+                } catch (e) {
+                    log.error('Failed to save screenshot for url: ' + page.url);
+                    success = false;
+                    return;
+                }
+
+                // Process results
+                if (proc.status === 0 && !proc.error && !proc.stderr) {
+                    return shots++;
+                }
+
+                // Report errors if we're still here
+                success = false;
+                log.error(util.format("ImageMagick errored for file: '%s':", path.relative(process.cwd(), file)));
+                log.info(' ' + JSON.stringify(proc.error));
+                if (proc.stderr) {
+                    log.warning(util.prefixStdStream(' stderr', proc.stderr));
+                }
+                if (proc.stdout) {
+                    log.warning(util.prefixStdStream(' stdout', proc.stdout));
                 }
             });
-
-            var base = baseDir + '/' + page.name + '/';
-            util.mkdir(base + path.dirname(component.file));
-
-            var command = [
-                '"' + util.escape(phantomjsPath) + '"',
-                '"' + util.escape(__dirname + '/phantomjs-script.js') + '"',
-                '"' + util.escape(page.url) + '"',
-                '"' + util.escape(base + component.name + '.png') + '"',
-                '"' + util.escape('1280x768') + '"',
-                '"' + util.escape(component.selector) + '"',
-                '"' + util.escape(component.ignore ? JSON.stringify(component.ignore) : '[]') + '"'
-            ].join(' ');
-
-            log.verbose('Taking screenshot with PhantomJS for image: ' +
-                page.name + '/' + component.name + '.png');
-
-            // Run PhantomJS and take screenshot
-            try {
-                child_process.execSync(command);
-                shots++;
-            } catch (e) {
-                log.error('Failed to save screenshot for url: ' + page.url);
-                success = false;
-            }
         });
     });
 

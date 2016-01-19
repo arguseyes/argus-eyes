@@ -50,8 +50,8 @@ $ npm install argus-eyes -g
 ## Introduction
 
 After installing, you want to tell argus-eyes which pages and which components to check for visual regression.
-Argus-eyes works by going over a straightforward JSON file containing the pages with their url's, and the components
-with their CSS-selectors.
+Argus-eyes works by going over a straightforward JSON file containing the resolutions you want to capture, as well as
+the pages with their url's, and the components with their CSS-selectors.
 
 Once argus-eyes knows where to find the components, it's time for some command line action. The first command you want
 to use is `$ argus-eyes add master`. This makes argus-eyes go over the config file and take screenshots of
@@ -73,14 +73,15 @@ is created. This folder contains overlay-images of the offending components, hig
 Before argus-eyes can measure visual differences, it needs a list of pages and components. By
 default argus-eyes expects an **`argus-eyes.json`** file in the current working directory.
 
-The config file must be a valid JSON object, containing *exactly* the following 2 arrays: **`pages`** and
-**`components`**. Page objects require a name, url and list of components. Components require a name and a CSS-selector.
-Components can optionally take a list of selectors of elements to ignore, this selector is appended to the component
-selector.
+The config file must be a valid JSON object, containing 3 arrays: **`sizes`**, **`pages`** and
+**`components`**. Sizes are simple strings. Page objects require a name, url and list of components. Components require
+a name and a CSS-selector. Components can optionally take a list of selectors of elements to ignore, this selector is
+appended to the component selector. See the [Config](#config) section for a more detailed format description.
 
 **Example config file:**
 ```json
 {
+  "sizes": ["320x480", "1280x768"],
   "pages": [ {
       "name": "homepage",
       "url": "http://localhost:3000/",
@@ -157,13 +158,17 @@ If any differences are found, the visual diff images are stored in **`.argus-eye
 ### Config
 
 Argus-eyes will look in the current working directory for a file named **`argus-eyes.json`**. This file contains your
-pages and components. You can specify a different location file using the **`--config`** argument, as described in
-[Options](#options).
+sizes, pages and components. You can specify a different location file using the **`--config`** argument, as described
+in [Options](#options).
 
 The config needs to be valid [JSON](http://www.json.org/), and it needs to obey this format specification:
 
 ```js
 {
+  sizes: [
+    String               // Size string, example: "1024x768"
+    // ...
+  ],
   pages: [
     {
       name: String,      // Identifier, used in filenames

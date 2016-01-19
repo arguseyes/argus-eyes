@@ -22,6 +22,7 @@ var action = [];
  *   color: Boolean,
  *   threshold: Number,
  *   im: String,
+ *   sizes: String[],
  *   pages: { name: String, url: String, components: String[] }[],
  *   components: { name: String, selector: String, ignore: String[] }[]
  * }} Config
@@ -33,6 +34,7 @@ var config = {
     color: true,
     threshold: 2,
     im: '',
+    sizes: [],
     pages: [],
     components: []
 };
@@ -204,6 +206,7 @@ function _parseCliPositionalArguments(argv) {
  * @private
  * @param {Config} config
  * @param {{
+ *   sizes: String[],
  *   pages: { name: String, url: String, components: String[] }[],
  *   components: { name: String, selector: String, ignore: String[] }[]
  * }} userConfig
@@ -212,15 +215,24 @@ function _parseCliPositionalArguments(argv) {
  */
 function _mergeConfig(config, userConfig) {
 
-    // Validate pages and components arrays
+    // Validate sizes
+    if (!Array.isArray(userConfig.sizes) || userConfig.sizes.length < 1) {
+        throw new Error('Config: No sizes found!');
+    }
+    userConfig.sizes.forEach(size => {
+        if (typeof size !== 'string') {
+            throw new Error('Config: All sizes need to be a string!');
+        }
+        var sizes = size.split('x').map(x => parseInt(x, 10));
+        if (sizes.length !== 2 || !(sizes[0] > 0) || !(sizes[1] > 0)) {
+            throw new Error('Config: All sizes need to be a correctly formatted string!');
+        }
+    });
+
+    // Validate pages
     if (!Array.isArray(userConfig.pages) || userConfig.pages.length < 1) {
         throw new Error('Config: No pages found!');
     }
-    if (!Array.isArray(userConfig.components) || userConfig.components.length < 1) {
-        throw new Error('Config: No components found!');
-    }
-
-    // Validate pages
     userConfig.pages.forEach(page => {
         if (!page.name || typeof page.name !== 'string' || !page.url || typeof page.url !== 'string') {
             throw new Error('Config: All pages need a name and url!');
@@ -231,6 +243,9 @@ function _mergeConfig(config, userConfig) {
     });
 
     // Validate components
+    if (!Array.isArray(userConfig.components) || userConfig.components.length < 1) {
+        throw new Error('Config: No components found!');
+    }
     userConfig.components.forEach(component => {
         if (!component.name || typeof component.name !== 'string' || !component.selector || typeof component.selector !== 'string') {
             throw new Error('Config: All components need a name and selector!');
@@ -251,6 +266,7 @@ function _mergeConfig(config, userConfig) {
     });
 
     // Manually merge objects
+    config.sizes = userConfig.sizes;
     config.pages = userConfig.pages;
     config.components = userConfig.components;
 

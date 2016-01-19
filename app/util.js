@@ -1,8 +1,8 @@
 var child_process = require('child_process');
 var fs            = require('fs');
 var util          = require('util');
-var glob          = require('glob');
-var mkdirp        = require('mkdirp');
+var glob          = require('glob').sync;
+var mkdirp        = require('mkdirp').sync;
 
 /**
  * Expose module functions
@@ -15,6 +15,7 @@ module.exports = {
     mkdir,
     removeEmptyDirectories,
     format: util.format,
+    prefixStdStream,
     plural
 };
 
@@ -79,22 +80,48 @@ function isExecutable(cmd, args) {
  */
 function mkdir(dir) {
     try {
-        mkdirp.sync(dir);
+        mkdirp(dir);
     } catch (e) {}
 }
 
 /**
  * Remove all empty directories within a path
- * @param {String} dir
+ *
+ * @param {String} path
+ * @returns {Boolean}
  */
-function removeEmptyDirectories(dir) {
-    glob.sync(dir + '/**').forEach(node => {
-        var isDir = directoryExists(node);
-        var isEmpty = glob.sync(node + '/**/*').length === 0;
-        if (isDir && isEmpty) {
-            fs.rmdir(node);
-        }
-    });
+function removeEmptyDirectories(path) {
+
+    var getEmptyDirs = node => {
+        dirs = getAllDirs(node).filter(isEmptyDir);
+        return dirs.length ? dirs : false;
+    };
+    var getAllDirs = node => getAllNodes(node).filter(directoryExists);
+    var isEmptyDir = node => getAllNodes(node).length === 0;
+    var getAllNodes = path => glob(path + '/**/*');
+
+    try {
+        var dirs;
+        while (dirs = getEmptyDirs(path)) dirs.map(fs.rmdirSync);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+/**
+ * Prefix standard stream output
+ *
+ * @param {String} stream - Stream name, such as 'stdout'
+ * @param {String} str - Output string to process
+ * @returns {String}
+ */
+function prefixStdStream(stream, str) {
+    return str
+        .trim()
+        .split('\n')
+        .map(line => stream + ': ' + line)
+        .join('\n');
 }
 
 /**
