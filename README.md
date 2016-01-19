@@ -231,7 +231,7 @@ is bigger than this percentage, it will be treated as different and reported as 
 
 When comparing screenshots, argus-eyes checks if all pixels in screenshots are identical. The difference is calculated
 by dividing the number of different pixels by the total number of pixels, giving a percentage. The image is considered
-different when this percentage equals or exceeds the threshold.
+different when this percentage exceeds the threshold percentage.
 
 **Be advised**: You can [exclude html elements](#config) from being captured! You might want to look into that before
 increasing the threshold, since that will also increase the chance of unintended changes getting through.

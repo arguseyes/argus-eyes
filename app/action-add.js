@@ -4,7 +4,7 @@ var util          = require('./util');
 var child_process = require('child_process');
 var path          = require('path');
 var phantomjsPath = require('phantomjs').path;
-var rimraf        = require('rimraf');
+var rimraf        = require('rimraf').sync;
 
 /**
  * Action `add`
@@ -21,7 +21,7 @@ module.exports = function add(id) {
 
     var baseDir = config.base + '/' + id;
     if (util.directoryExists(baseDir)) {
-        rimraf.sync(baseDir);
+        rimraf(baseDir);
     }
 
     log.verbose(util.format('Found %d size%s, %d page%s and %d component%s',
@@ -50,21 +50,15 @@ module.exports = function add(id) {
                     path.relative(baseDir, file)));
 
                 // Run PhantomJS and take screenshot
-                try {
-                    var args = [
-                        __dirname + '/phantomjs-script.js',
-                        page.url,
-                        file,
-                        size,
-                        component.selector,
-                        component.ignore ? JSON.stringify(component.ignore) : '[]'
-                    ];
-                    var proc = child_process.spawnSync(phantomjsPath, args, { encoding: 'utf8' });
-                } catch (e) {
-                    log.error('Failed to save screenshot for url: ' + page.url);
-                    success = false;
-                    return;
-                }
+                var args = [
+                    __dirname + '/phantomjs-script.js',
+                    page.url,
+                    file,
+                    size,
+                    component.selector,
+                    component.ignore ? JSON.stringify(component.ignore) : '[]'
+                ];
+                var proc = child_process.spawnSync(phantomjsPath, args, { encoding: 'utf8' });
 
                 // Process results
                 if (proc.status === 0 && !proc.error && !proc.stderr) {
@@ -74,7 +68,7 @@ module.exports = function add(id) {
                 // Report errors if we're still here
                 success = false;
                 log.error(util.format("ImageMagick errored for file: '%s':", path.relative(process.cwd(), file)));
-                log.info(' ' + JSON.stringify(proc.error));
+                log.verbose(' ' + JSON.stringify(proc.error));
                 if (proc.stderr) {
                     log.warning(util.prefixStdStream(' stderr', proc.stderr));
                 }

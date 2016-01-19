@@ -23,12 +23,11 @@ var action = cfgLoader.getAction();
 switch (action[0]) {
 
     case 'add':
-        var success = actionAdd(action[1]);
-        process.exit(success ? 0 : 1);
+        process.exit(actionAdd(action[1]) ? 0 : 1);
         break;
 
     case 'compare':
-        actionCompare(action[1], action[2], success => process.exit(success ? 0 : 1));
+        process.exit(actionCompare(action[1], action[2]) ? 0 : 1);
         break;
 
     case 'version':

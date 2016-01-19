@@ -4,8 +4,8 @@ var util          = require('./util');
 var child_process = require('child_process');
 var fs            = require('fs');
 var path          = require('path');
-var glob          = require('glob');
-var rimraf        = require('rimraf');
+var glob          = require('glob').sync;
+var rimraf        = require('rimraf').sync;
 
 /**
  * Action `compare`
@@ -13,37 +13,26 @@ var rimraf        = require('rimraf');
  *
  * @param {String} id1 - Left set of screenshots
  * @param {String} id2 - Right set of screenshots
- * @param {Function} cb - Callback, invoked when finished
  * @return {Boolean}
  */
-module.exports = function compare(id1, id2, cb) {
+module.exports = function compare(id1, id2) {
 
     var config = cfgLoader.getConfig();
 
     var diffDirectory = config.base + '/diff_' + id1 + '_' + id2;
-    var dir1 = glob.sync(config.base + '/' + id1 + '/**/*.png');
-    var dir2 = glob.sync(config.base + '/' + id2 + '/**/*.png');
+    var dir1 = glob(config.base + '/' + id1 + '/**/*.png');
+    var dir2 = glob(config.base + '/' + id2 + '/**/*.png');
 
     // Clean up a potentially existing diff directory
     if (util.directoryExists(diffDirectory)) {
-        rimraf.sync(diffDirectory);
+        rimraf(diffDirectory);
     }
     util.mkdir(diffDirectory);
 
     showDirectoryDifferenceWarnings(dir1, dir2, id1, id2);
 
-    // Asynchronous "is-everything-finished?" method
-    var differences = 0;
-    var count = dir1.length;
-    var done = () => {
-        if (--count === 0) { // are all async functions finished?
-            util.removeEmptyDirectories(diffDirectory);
-            reportResults(diffDirectory, differences);
-            cb(!!differences);
-        }
-    };
-
     // Create diff images, in parallel
+    var differences = 0;
     dir1.forEach(file1 => {
 
         var filename = path.relative(config.base + '/' + id1, file1);
@@ -56,7 +45,7 @@ module.exports = function compare(id1, id2, cb) {
         var sizes2 = getImageSize(file2);
         if (!sizes1 || !sizes2) {
             log.error('Could not probe both left and right for image dimensions: ' + filename);
-            return done();
+            return;
         }
 
         // Resize image if it's smaller
@@ -72,58 +61,69 @@ module.exports = function compare(id1, id2, cb) {
             } catch (e) {
                 differences++;
                 log.error('Could not resize smaller image: ' + filename);
-                return done();
+                return;
             }
         }
 
-        // Execute imagemagick `compare` command
-        var command = util.format('"%s" "%s" "%s" -metric AE "%s"',
-            util.escape(config.im + 'compare'),
-            util.escape(file1),
-            util.escape(file2),
-            util.escape(diffFile));
-        child_process.exec(command, (err, stdout, stderr) => {
+        // Execute ImageMagick `compare` command
+        var command = config.im + 'compare';
+        var args = [file1, file2, '-metric', 'AE', diffFile];
+        var proc = child_process.spawnSync(command, args, { encoding: 'utf8' });
 
-            // Remove temporary image
-            if (fileResized && util.fileExists(fileResized)) {
-                fs.unlinkSync(fileResized);
-            }
+        // Remove temporary image
+        if (fileResized && util.fileExists(fileResized)) {
+            fs.unlinkSync(fileResized);
+        }
 
-            // `compare` exit code 0 means equal, 1 means different, all else is an error
-            if (err instanceof Error && err.code !== 0 && err.code !== 1) {
-                differences++;
-                log.warning(util.format("ImageMagick exited with code %d for file: '%s'", err.code, filename));
-                log.warning(' ' + stderr.trim());
-                return done();
-            }
+        // Dropout on success
+        if (proc.status === 0 && !proc.error && proc.stderr === '0') {
+            fs.unlinkSync(diffFile);
+            log.verbose(util.format("Found exactly equal: '%s'", filename));
+            return;
+        }
 
-            // What percentage of pixels changed?
-            var pixelsChanged = parseInt(stderr.trim(), 10);
-            var percentage = (pixelsChanged / (sizes1[0] * sizes1[1]) * 100);
+        // Dropout on ImageMagick error
+        //  `compare` exit code 0 means equal, 1 means different, all else is an error
+        if (proc.status !== 0 && proc.status !== 1) {
+            log.warning(util.format("ImageMagick exited with code %d for file: '%s'", proc.status, filename));
+            log.warning(util.prefixStdStream(' stderr', proc.stderr));
+            return;
+        }
 
-            // Report when verbose and remove diff image when necessary
-            if (pixelsChanged > 0 && percentage > config.threshold) {
-                differences++;
-                log.verbose(util.format(
-                    "Difference (%d%) above threshold (%d%) found for: '%s'",
-                    percentage.toFixed(2),
-                    config.threshold,
-                    filename));
-            } else if (pixelsChanged > 0) {
-                fs.unlinkSync(diffFile);
-                log.verbose(util.format(
-                    "Difference (%d%) not bigger than threshold (%d%) for: '%s'",
-                    percentage.toFixed(2),
-                    config.threshold,
-                    filename));
-            } else {
-                fs.unlinkSync(diffFile);
-                log.verbose(util.format("Found exactly equal: '%s'", filename));
-            }
+        // Dropout on OS error
+        if (proc.error) {
+            log.warning(util.format("ImageMagick could not be started for file: '%s'", filename));
+            log.verbose(' ' + JSON.stringify(proc.error));
+            log.warning(util.prefixStdStream(' stderr', proc.stderr));
+            return;
+        }
 
-            return done();
-        });
+        // What percentage of pixels changed?
+        var pixelsChanged = parseInt(proc.stderr.trim(), 10);
+        var percentage = (pixelsChanged / (sizes1[0] * sizes1[1]) * 100);
+
+        // Report when verbose and remove diff image when necessary
+        if (pixelsChanged > 0 && percentage > config.threshold) {
+            differences++;
+            log.verbose(util.format(
+                "Difference (%d%) above threshold (%d%) found for: '%s'",
+                percentage.toFixed(2),
+                config.threshold,
+                filename));
+        } else if (pixelsChanged > 0) {
+            fs.unlinkSync(diffFile);
+            log.verbose(util.format(
+                "Difference (%d%) not bigger than threshold (%d%) for: '%s'",
+                percentage.toFixed(2),
+                config.threshold,
+                filename));
+        }
     });
+
+    util.removeEmptyDirectories(diffDirectory);
+    reportResults(diffDirectory, differences);
+
+    return !differences;
 
 };
 
@@ -168,6 +168,7 @@ function getDirectoryDiff(dir, id1, id2, cb) {
 /**
  * Returns the dimensions of an image file
  *
+ * @todo Refactor execSync to spawnSync
  * @param {String} file - The full path to an image file
  * @returns {[Number, Number] | Boolean}
  */
@@ -202,6 +203,7 @@ function isSmallest(sizes1, sizes2) {
 /**
  * Resize an image to specified dimensions
  *
+ * @todo Refactor execSync to spawnSync
  * @param {String} file - Left filename
  * @param {[Number, Number]} sizes - Dimensions of the left file
  * @throws {Error}
