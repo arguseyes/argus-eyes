@@ -67,7 +67,7 @@ module.exports = function add(id) {
 
                 // Report errors if we're still here
                 success = false;
-                log.error(util.format("ImageMagick errored for file: '%s':", path.relative(process.cwd(), file)));
+                log.error(util.format("PhantomJS errored for file: '%s':", path.relative(process.cwd(), file)));
                 log.verbose(' ' + JSON.stringify(proc.error));
                 if (proc.stderr) {
                     log.warning(util.prefixStdStream(' stderr', proc.stderr));
