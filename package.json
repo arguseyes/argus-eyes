@@ -8,7 +8,7 @@
   },
   "scripts": {
     "pretest": "node tests/mock-server/server-controller.js start",
-    "test": "node node_modules/mocha/bin/mocha --recursive --timeout 0 /Users/bvandermeer/Source/argus-eyes/tests/spec/",
+    "test": "node node_modules/mocha/bin/mocha --recursive --timeout 0 tests/spec/",
     "posttest": "node tests/mock-server/server-controller.js stop"
   },
   "preferGlobal": true,
