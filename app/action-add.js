@@ -67,8 +67,11 @@ module.exports = function add(id) {
 
                 // Report errors if we're still here
                 success = false;
-                log.error(util.format("PhantomJS errored for file: '%s':", path.relative(process.cwd(), file)));
-                log.verbose(' ' + JSON.stringify(proc.error));
+                log.error(util.format("PhantomJS errored for file: '%s'", path.relative(process.cwd(), file)));
+
+                if (proc.error) {
+                    log.verbose(' ' + JSON.stringify(proc.error));
+                }
                 if (proc.stderr) {
                     log.warning(util.prefixStdStream(' stderr', proc.stderr));
                 }
