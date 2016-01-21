@@ -6,6 +6,11 @@
   "bin": {
     "argus-eyes": "bin/argus-eyes.js"
   },
+  "scripts": {
+    "pretest": "node tests/mock-server/server-controller.js start",
+    "test": "node node_modules/mocha/bin/mocha --recursive --timeout 0 /Users/bvandermeer/Source/argus-eyes/tests/spec/",
+    "posttest": "node tests/mock-server/server-controller.js stop"
+  },
   "preferGlobal": true,
   "engines": {
     "node": ">=4.0"
@@ -41,5 +46,9 @@
     "phantomjs": "^1.9.19",
     "rimraf": "^2.5.0",
     "yargs": "^3.32.0"
+  },
+  "devDependencies": {
+    "express": "^4.13.3",
+    "mocha": "^2.3.4"
   }
 }

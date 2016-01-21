@@ -1,6 +1,7 @@
 # Application
 argus-eyes.json
 .argus-eyes
+pid
 
 # Node.js
 node_modules
