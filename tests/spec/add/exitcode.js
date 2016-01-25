@@ -8,7 +8,6 @@ describe('Action: Add', function() {
 
         it('should return 0 on successful capture', function() {
             var proc = spawnAdd('dev', 'add/exitcode-success.json');
-            console.log(proc);
             assert.equal(0, proc.status);
         });
 
