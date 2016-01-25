@@ -14,8 +14,8 @@ describe('Config file', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(0, proc.status);
-        assert.equal(true, /Usage:[\s\S]+Options:/.test(proc.stdout));
+        assert.equal(0, proc.status, proc.stdout);
+        assert.equal(true, /Usage:[\s\S]+Options:/.test(proc.stdout), proc.stdout);
     });
 
     it('should print the version without a config file', function() {
@@ -27,13 +27,13 @@ describe('Config file', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(0, proc.status);
-        assert.equal(true, /v\d+\.\d+\.\d+/.test(proc.stdout));
+        assert.equal(0, proc.status, proc.stdout);
+        assert.equal(true, /v\d+\.\d+\.\d+/.test(proc.stdout), proc.stdout);
     });
 
     it('should fail add & compare without a config file', function() {
         var proc = spawnAdd('dev', 'file-does-not-exist.json');
-        assert.equal(1, proc.status);
+        assert.equal(1, proc.status, proc.stdout);
     });
 
     // @todo implement
