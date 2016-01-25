@@ -1,9 +1,37 @@
 var assert = require('assert');
+var path = require('path');
+var spawnSync = require('child_process').spawnSync;
 var spawnAdd = require('../helpers/spawn-argus-eyes').spawnAdd;
 
 describe('Config file', function() {
 
-    it('should fail without a config file', function() {
+    it('should print the usage information without a config file', function() {
+
+        var args = [
+            path.normalize(__dirname + '/../../bin/argus-eyes.js'),
+            '--help'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(0, proc.status);
+        assert.equal(true, /Usage:[\s\S]+Options:/.test(proc.stdout));
+    });
+
+    it('should print the version without a config file', function() {
+
+        var args = [
+            path.normalize(__dirname + '/../../bin/argus-eyes.js'),
+            '--version'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(0, proc.status);
+        assert.equal(true, /v\d+\.\d+\.\d+/.test(proc.stdout));
+    });
+
+    it('should fail add & compare without a config file', function() {
         var proc = spawnAdd('dev', 'file-does-not-exist.json');
         assert.equal(1, proc.status);
     });
