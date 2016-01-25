@@ -42,40 +42,17 @@ var config = {
 /**
  * Expose module functions
  */
-module.exports = {
-    getConfig,
-    getAction,
-    loadConfig
-};
+module.exports = { getConfig, getAction };
 
 /**
  * Returns the config object
  *
+ * @throws {Error}
  * @returns {Config}
  */
 function getConfig() {
-    return config;
-}
 
-/**
- * Returns the action object
- *
- * @returns {String[]}
- */
-function getAction() {
-    return action;
-}
-
-/**
- * Load config and action into the current state
- *
- * @throws {Error}
- */
-function loadConfig() {
-
-    // Build config and action from cli input
     config = _parseCliOptions(argv, config);
-    action = _parseCliPositionalArguments(argv);
 
     // Attempt to load user config
     try {
@@ -86,6 +63,17 @@ function loadConfig() {
 
     // Merge loaded config file into config object
     config = _mergeConfig(config, userConfig);
+
+    return config;
+}
+
+/**
+ * Returns the action object
+ *
+ * @returns {String[]}
+ */
+function getAction() {
+    return _parseCliPositionalArguments(argv);
 }
 
 /**

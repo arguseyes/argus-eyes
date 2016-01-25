@@ -27,6 +27,14 @@ function info(msg) {
  * @param {String} msg
  */
 function verbose(msg) {
+
+    var verbose;
+    try {
+        verbose = cfgLoader.getConfig().verbose;
+    } catch (e) {
+        verbose = false;
+    }
+
     if (cfgLoader.getConfig().verbose) {
         _log(chalk.gray('[verbose] ' + msg));
     }
@@ -66,6 +74,13 @@ function error(msg) {
  * @param {String} coloredMessage
  */
 function _log(coloredMessage) {
-    var useColor = cfgLoader.getConfig().color;
+
+    var useColor;
+    try {
+        useColor = cfgLoader.getConfig().color;
+    } catch (e) {
+        useColor = false;
+    }
+
     console.log(useColor ? coloredMessage : chalk.stripColor(coloredMessage));
 }

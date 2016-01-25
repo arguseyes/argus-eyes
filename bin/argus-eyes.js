@@ -10,23 +10,35 @@ var util          = require('../app/util');
 var actionAdd     = require('../app/action-add');
 var actionCompare = require('../app/action-compare');
 
-// Initialize configuration
+// Get action
+var config;
 try {
-    cfgLoader.loadConfig();
+    var action = cfgLoader.getAction();
 } catch (e) {
     log.error('Error: ' + e.message);
     process.exit(1);
 }
 
 // Run action
-var action = cfgLoader.getAction();
 switch (action[0]) {
 
     case 'add':
+        try {
+            config = cfgLoader.getConfig();
+        } catch (e) {
+            log.error('Error: ' + e.message);
+            process.exit(1);
+        }
         process.exit(actionAdd(action[1]) ? 0 : 1);
         break;
 
     case 'compare':
+        try {
+            config = cfgLoader.getConfig();
+        } catch (e) {
+            log.error('Error: ' + e.message);
+            process.exit(1);
+        }
         process.exit(actionCompare(action[1], action[2]) ? 0 : 1);
         break;
 
