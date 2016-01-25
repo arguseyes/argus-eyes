@@ -1,6 +1,11 @@
 # argus-eyes
 [![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
-[![build status](https://travis-ci.org/branneman/argus-eyes.svg)](https://travis-ci.org/branneman/argus-eyes)
+
+Build status:
+
+| Linux & Mac OS X | Windows |
+| --- | --- |
+| [![build status](https://travis-ci.org/branneman/argus-eyes.svg)](https://travis-ci.org/branneman/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/branneman/argus-eyes?branch=master&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
 
 A lightweight commandline tool for visual regression testing of UI components.
 
