@@ -1,13 +1,9 @@
 language: cpp
 env:
   - NODE_VERSION="4.0"
-  - NODE_VERSION="4.1"
-  - NODE_VERSION="4.2"
+  - NODE_VERSION="4"
   - NODE_VERSION="5.0"
-  - NODE_VERSION="5.1"
-  - NODE_VERSION="5.2"
-  - NODE_VERSION="5.3"
-  - NODE_VERSION="5.4"
+  - NODE_VERSION="5"
 os:
   - linux
   - osx
