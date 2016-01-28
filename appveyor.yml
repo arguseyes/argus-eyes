@@ -9,6 +9,7 @@ environment:
 # Install scripts. (runs after repo cloning)
 install:
   - cinst imagemagick
+  - ps: $env:Path += ";$((Get-ChildItem $env:programfiles | Where-Object {$_.PSIsContainer -eq $true -and $_.Name -match "imagemagick"}).FullName)"
   - ps: Install-Product node $env:nodejs_version
   - npm install
 
