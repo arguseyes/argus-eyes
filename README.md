@@ -212,6 +212,11 @@ Run argus-eyes and save all the screenshots under **`.argus-eyes/<name>/`**
 Compare the two sets of screenshots, creating overlay-images and reporting any difference. The process will exit with
 code 0 when no significant differences were found, code 1 when differences were found.
 
+#### `argus-eyes configtest`
+
+Run a config file syntax and test. It parses the config file and either reports *Config valid* or detailed information
+about the error.
+
 
 ### Options
 

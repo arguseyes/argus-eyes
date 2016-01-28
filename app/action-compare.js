@@ -1,11 +1,11 @@
-var cfgLoader     = require('./configLoader');
-var log           = require('./log');
-var util          = require('./util');
-var child_process = require('child_process');
-var fs            = require('fs');
-var path          = require('path');
-var glob          = require('glob').sync;
-var rimraf        = require('rimraf').sync;
+var argumentLoader = require('./cli/argumentLoader');
+var log            = require('./log');
+var util           = require('./util');
+var child_process  = require('child_process');
+var fs             = require('fs');
+var path           = require('path');
+var glob           = require('glob').sync;
+var rimraf         = require('rimraf').sync;
 
 /**
  * Action `compare`
@@ -17,11 +17,24 @@ var rimraf        = require('rimraf').sync;
  */
 module.exports = function compare(id1, id2) {
 
-    var config = cfgLoader.getConfig();
+    var config = argumentLoader.getConfig();
 
+    id1 = id1.replace('/', '-');
+    id2 = id2.replace('/', '-');
     var diffDirectory = config.base + '/diff_' + id1 + '_' + id2;
     var dir1 = glob(config.base + '/' + id1 + '/**/*.png');
     var dir2 = glob(config.base + '/' + id2 + '/**/*.png');
+
+    // See if the given left and right sides make sense
+    if (id1 === id2) {
+        throw new Error('You cannot compare a set with itself');
+    }
+    if (!util.directoryExists(config.base + '/' + id1)) {
+        throw new Error(util.format("Left side not found: '%s'", id1));
+    }
+    if (!util.directoryExists(config.base + '/' + id2)) {
+        throw new Error(util.format("Right side not found: '%s'", id2));
+    }
 
     // Clean up a potentially existing diff directory
     if (util.directoryExists(diffDirectory)) {
@@ -174,7 +187,7 @@ function getDirectoryDiff(dir, id1, id2, cb) {
  */
 function getImageSize(file) {
 
-    var config = cfgLoader.getConfig();
+    var config = argumentLoader.getConfig();
 
     var command = util.format(
         '"%s" -ping -format "%w %h" "%s"',
@@ -211,7 +224,8 @@ function isSmallest(sizes1, sizes2) {
  */
 function resizeTo(file, sizes) {
 
-    var imConvert = cfgLoader.getConfig().im + 'convert';
+    var config    = argumentLoader.getConfig();
+    var imConvert = config.im + 'convert';
     var newName   = file + '.tmp.png';
     var newSizes  = sizes[0] + 'x' + sizes[1];
 

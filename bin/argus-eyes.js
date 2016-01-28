@@ -3,17 +3,19 @@
 process.title = 'argus-eyes';
 
 // Load dependencies
-var pkg           = require('../package');
-var log           = require('../app/log');
-var cfgLoader     = require('../app/configLoader');
-var util          = require('../app/util');
-var actionAdd     = require('../app/action-add');
-var actionCompare = require('../app/action-compare');
+var pkg            = require('../package');
+var log            = require('../app/log');
+var argumentLoader = require('../app/cli/argumentLoader');
+var userCfgLoader  = require('../app/cli/userConfigLoader');
+var actionAdd      = require('../app/action-add');
+var actionCompare  = require('../app/action-compare');
 
-// Get action
-var config;
+// Parse cli arguments into action & config
 try {
-    var action = cfgLoader.getAction();
+    var action = argumentLoader.getAction();
+    var config = argumentLoader.getConfig();
+    log.setVerbose(config.verbose);
+    log.setUseColor(config.color);
 } catch (e) {
     log.error('Error: ' + e.message);
     process.exit(1);
@@ -24,7 +26,7 @@ switch (action[0]) {
 
     case 'add':
         try {
-            config = cfgLoader.getConfig();
+            userCfgLoader.getUserConfig();
         } catch (e) {
             log.error('Error: ' + e.message);
             process.exit(1);
@@ -34,12 +36,23 @@ switch (action[0]) {
 
     case 'compare':
         try {
-            config = cfgLoader.getConfig();
+            userCfgLoader.getUserConfig();
         } catch (e) {
             log.error('Error: ' + e.message);
             process.exit(1);
         }
         process.exit(actionCompare(action[1], action[2]) ? 0 : 1);
+        break;
+
+    case 'configtest':
+        try {
+            userCfgLoader.getUserConfig();
+            log.success('Config valid.');
+            process.exit(0);
+        } catch (e) {
+            log.error('Config invalid: ' + e.message);
+            process.exit(1);
+        }
         break;
 
     case 'version':
@@ -51,6 +64,7 @@ switch (action[0]) {
             '\nUsage:\n' +
             ' argus-eyes add <name>                Take new screenshots, save set as <name>\n' +
             ' argus-eyes compare <left> <right>    Compare 2 sets of screenshots by name\n' +
+            ' argus-eyes configtest                Test the config file\n' +
             '\nOptions:\n' +
             " --config=…                           Specify config file, defaults to 'argus-eyes.json'\n" +
             " --base=…                             Set base for storing and comparing image sets, defaults to '.argus-eyes'\n" +

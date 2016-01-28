@@ -1,10 +1,11 @@
-var cfgLoader     = require('./configLoader');
-var log           = require('./log');
-var util          = require('./util');
-var child_process = require('child_process');
-var path          = require('path');
-var phantomjsPath = require('phantomjs').path;
-var rimraf        = require('rimraf').sync;
+var argumentLoader = require('./cli/argumentLoader');
+var userCfgLoader  = require('./cli/userConfigLoader');
+var log            = require('./log');
+var util           = require('./util');
+var child_process  = require('child_process');
+var path           = require('path');
+var phantomjsPath  = require('phantomjs').path;
+var rimraf         = require('rimraf').sync;
 
 /**
  * Action `add`
@@ -15,28 +16,31 @@ var rimraf        = require('rimraf').sync;
  */
 module.exports = function add(id) {
 
-    var config  = cfgLoader.getConfig();
+    var config = argumentLoader.getConfig();
+    var userConfig = userCfgLoader.getUserConfig();
+
     var success = true;
     var shots   = 0;
 
+    id = id.replace('/', '-');
     var baseDir = config.base + '/' + id;
     if (util.directoryExists(baseDir)) {
         rimraf(baseDir);
     }
 
     log.verbose(util.format('Found %d size%s, %d page%s and %d component%s',
-        config.sizes.length,
-        util.plural(config.sizes.length),
-        config.pages.length,
-        util.plural(config.pages.length),
-        config.components.length,
-        util.plural(config.components.length)));
+        userConfig.sizes.length,
+        util.plural(userConfig.sizes.length),
+        userConfig.pages.length,
+        util.plural(userConfig.pages.length),
+        userConfig.components.length,
+        util.plural(userConfig.components.length)));
 
-    config.sizes.forEach(size => {
-        config.pages.forEach(page => {
+    userConfig.sizes.forEach(size => {
+        userConfig.pages.forEach(page => {
             page.components.forEach(componentId => {
 
-                var component = config.components.find(component => {
+                var component = userConfig.components.find(component => {
                     if (component.name === componentId) {
                         return component;
                     }
