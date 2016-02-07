@@ -4,7 +4,7 @@ var log            = require('./log');
 var util           = require('./util');
 var child_process  = require('child_process');
 var path           = require('path');
-var phantomjsPath  = require('phantomjs').path;
+var phantomjsPath  = require('phantomjs-prebuilt').path;
 var rimraf         = require('rimraf').sync;
 
 /**
@@ -60,12 +60,14 @@ module.exports = function add(id) {
                     file,
                     size,
                     component.selector,
-                    component.ignore ? JSON.stringify(component.ignore) : '[]'
+                    component.ignore ? JSON.stringify(component.ignore) : '[]',
+                    (userConfig['finished-when'] || 'return true')
                 ];
                 var proc = child_process.spawnSync(phantomjsPath, args, { encoding: 'utf8' });
 
                 // Process results
                 if (proc.status === 0 && !proc.error && !proc.stderr) {
+                    if (proc.stdout) log.verbose(util.prefixStdStream(' PhantomJS stdout', proc.stdout));
                     return shots++;
                 }
 
@@ -73,15 +75,9 @@ module.exports = function add(id) {
                 success = false;
                 log.error(util.format("PhantomJS errored for file: '%s'", path.relative(process.cwd(), file)));
 
-                if (proc.error) {
-                    log.verbose(' ' + JSON.stringify(proc.error));
-                }
-                if (proc.stderr) {
-                    log.warning(util.prefixStdStream(' stderr', proc.stderr));
-                }
-                if (proc.stdout) {
-                    log.warning(util.prefixStdStream(' stdout', proc.stdout));
-                }
+                if (proc.error)  log.verbose(' ' + JSON.stringify(proc.error));
+                if (proc.stderr) log.warning(util.prefixStdStream(' stderr', proc.stderr));
+                if (proc.stdout) log.warning(util.prefixStdStream(' stdout', proc.stdout));
             });
         });
     });

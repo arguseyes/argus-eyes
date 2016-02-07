@@ -13,11 +13,12 @@ var maxTries     = 20;
 var tryTimeout   = 100;
 
 // CLI Arguments
-var url    = system.args[1];
-var file   = system.args[2];
-var size   = system.args[3].split('x');
-var sel    = system.args[4];
-var ignore = JSON.parse(system.args[5]);
+var url        = system.args[1];
+var file       = system.args[2];
+var size       = system.args[3].split('x');
+var sel        = system.args[4];
+var ignore     = JSON.parse(system.args[5]);
+var userScript = system.args[6];
 
 page.viewportSize = {
     width: size[0],
@@ -38,8 +39,54 @@ page.open(url, function(status) {
         return phantom.exit(1);
     }
 
-    // Initalize script
+    // Initalize PhantonJS script
     waitForLoad();
+
+    /**
+     * Wait for the ready state 'complete'
+     *  Repeatedly invoked until it succeeds or maxTries is reached.
+     */
+    function waitForLoad() {
+
+        currentTries++;
+
+        var readyState = page.evaluate(function() {
+            return document.readyState;
+        });
+
+        if (readyState === 'complete') {
+            currentTries = 0;
+            waitForUserScript();
+        } else if (currentTries < maxTries) {
+            setTimeout(waitForLoad, tryTimeout);
+        } else {
+            console.log('document.readyState not \'completed\', timed out after ' + maxTries + ' tries.');
+            phantom.exit(1);
+        }
+    }
+
+    /**
+     * Wait for the user script to report the page is ready for a screenshot
+     *  Repeatedly invoked until it succeeds or maxTries is reached.
+     */
+    function waitForUserScript() {
+
+        currentTries++;
+
+        var userScriptFinished = page.evaluate(function(userScript) {
+            return (Function(userScript))();
+        }, userScript);
+
+        if (userScriptFinished) {
+            currentTries = 0;
+            tryRemoveIgnores();
+        } else if (currentTries < maxTries) {
+            setTimeout(waitForUserScript, tryTimeout);
+        } else {
+            console.log('finished-when userscript still not completed, timed out after ' + maxTries + ' tries.');
+            phantom.exit(1);
+        }
+    }
 
     /**
      * Removes any ignored elements from the DOM
@@ -129,29 +176,6 @@ page.open(url, function(status) {
             setTimeout(tryScreenshot, tryTimeout);
         } else {
             console.log('Unable to write file: \'' + file + '\', timed out after ' + maxTries + ' tries.');
-            phantom.exit(1);
-        }
-    }
-
-    /**
-     * Wait for the ready state 'complete'
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function waitForLoad() {
-
-        currentTries++;
-
-        var readyState = page.evaluate(function() {
-            return document.readyState;
-        });
-
-        if (readyState === 'complete') {
-            currentTries = 0;
-            tryRemoveIgnores();
-        } else if (currentTries < maxTries) {
-            setTimeout(waitForLoad, tryTimeout);
-        } else {
-            console.log('document.readyState not \'completed\', timed out after ' + maxTries + ' tries.');
             phantom.exit(1);
         }
     }

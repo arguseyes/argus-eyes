@@ -61,6 +61,11 @@ function validateUserConfig(userConfig) {
         }
     });
 
+    // Validate finished-when
+    if (typeof userConfig['finished-when'] !== 'undefined' && typeof userConfig['finished-when'] !== 'string') {
+        throw new Error('Config: finished-when must be a valid JavaScript string!');
+    }
+
     // Validate pages
     if (!Array.isArray(userConfig.pages) || userConfig.pages.length < 1) {
         throw new Error('Config: No pages found!');

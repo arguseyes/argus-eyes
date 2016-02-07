@@ -43,7 +43,7 @@
     "chalk": "^1.1.1",
     "glob": "^6.0.4",
     "mkdirp": "^0.5.1",
-    "phantomjs": "^1.9.19",
+    "phantomjs-prebuilt": "^2.1.4",
     "rimraf": "^2.5.0",
     "yargs": "^3.32.0"
   },
