@@ -27,21 +27,21 @@ switch (action[0]) {
     case 'add':
         try {
             userCfgLoader.getUserConfig();
+            process.exit(actionAdd(action[1]) ? 0 : 1);
         } catch (e) {
             log.error('Error: ' + e.message);
-            process.exit(1);
         }
-        process.exit(actionAdd(action[1]) ? 0 : 1);
+        process.exit(1);
         break;
 
     case 'compare':
         try {
             userCfgLoader.getUserConfig();
+            process.exit(actionCompare(action[1], action[2]) ? 0 : 1);
         } catch (e) {
             log.error('Error: ' + e.message);
-            process.exit(1);
         }
-        process.exit(actionCompare(action[1], action[2]) ? 0 : 1);
+        process.exit(1);
         break;
 
     case 'configtest':
