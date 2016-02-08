@@ -7,6 +7,7 @@ Build status:
 | --- | --- |
 | [![build status](https://travis-ci.org/branneman/argus-eyes.svg)](https://travis-ci.org/branneman/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/branneman/argus-eyes?branch=master&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
 
+<!-- start -->
 A lightweight commandline tool for visual regression testing of UI components.
 
 Argus-eyes does 3 things for you:  
@@ -21,6 +22,7 @@ Screenshots are caputured with [PhantomJS](http://phantomjs.org/), comparing sce
 | Production version | Development version | Diff image |
 | --- |---| ---|
 | ![image 1](img/nav-menu-1.png) | ![image 2](img/nav-menu-2.png)| ![diff image](img/nav-menu-3.png) |
+<!-- end -->
 
 
 ## Contents
@@ -53,6 +55,7 @@ $ npm install argus-eyes -g
 *Note:* For OSX we recommend installing ImageMagick with [Homebrew](http://brew.sh/): `$ brew install imagemagick`
 
 
+<!-- start -->
 ## Introduction
 
 After installing, you want to tell argus-eyes which pages and which components to check for visual regression.
@@ -70,8 +73,10 @@ branches and do a new `$ argus-eyes add dev`.
 To compare the 2 sets you run `$ argus-eyes compare master dev`, that's it! Argus-eyes now checks all supposedly
 identical screenshots for visual differences. If differences were found, a new folder **`.argus-eyes/diff_master_dev`**
 is created. This folder contains overlay-images of the offending components, highlighting their differences in red.
+<!-- end -->
 
 
+<!-- start -->
 ## Guide
 
 ### Step 1: Setup config file
@@ -157,8 +162,10 @@ $ argus-eyes compare develop feature/navigation
 ```
 
 If any differences are found, the visual diff images are stored in **`.argus-eyes/diff_develop_feature-navigation/`**
+<!-- end -->
 
 
+<!-- start -->
 ## Reference
 
 ### Config
@@ -309,6 +316,7 @@ Print version.
 ```bash
 $ argus-eyes --version
 ```
+<!-- end -->
 
 
 ## Contributing
