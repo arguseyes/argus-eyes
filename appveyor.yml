@@ -1,4 +1,4 @@
-# Test against this version of Node.js
+# Test against these versions of Node.js
 environment:
   matrix:
   - nodejs_version: "4.0"
@@ -6,18 +6,20 @@ environment:
   - nodejs_version: "5.0"
   - nodejs_version: "5"
 
-# Install scripts. (runs after repo cloning)
+# Install scripts
 install:
-  - cinst imagemagick
-  - ps: $env:Path += ";$((Get-ChildItem $env:programfiles | Where-Object {$_.PSIsContainer -eq $true -and $_.Name -match "imagemagick"}).FullName)"
+  - ps: |
+      choco install imagemagick -y
+      $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + `
+        ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
   - ps: Install-Product node $env:nodejs_version
   - npm install
 
-# Post-install test scripts.
+# Application test scripts
 test_script:
   - node --version
   - npm --version
   - npm test
 
-# Don't actually build.
+# Don't actually build
 build: off
