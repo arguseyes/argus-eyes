@@ -1,6 +1,6 @@
 {
   "name": "argus-eyes",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "A lightweight commandline tool for visual regression testing of UI components.",
   "main": "bin/argus-eyes.js",
   "bin": {
@@ -18,7 +18,7 @@
   "engineStrict": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/branneman/argus-eyes.git"
+    "url": "git+https://github.com/arguseyes/argus-eyes.git"
   },
   "keywords": [
     "visual regression",
@@ -36,9 +36,9 @@
   ],
   "license": "CC-BY-4.0",
   "bugs": {
-    "url": "https://github.com/branneman/argus-eyes/issues"
+    "url": "https://github.com/arguseyes/argus-eyes/issues"
   },
-  "homepage": "https://github.com/branneman/argus-eyes#readme",
+  "homepage": "https://github.com/arguseyes/argus-eyes#readme",
   "dependencies": {
     "chalk": "^1.1.1",
     "glob": "^6.0.4",
