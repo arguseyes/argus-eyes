@@ -1,13 +1,22 @@
 # Application
 argus-eyes.json
 .argus-eyes
+
+
+# Application Tests
 pid
+test-generated
+diff_baseline_current
+diff_baseline_test-generated
+diff_shots-baseline_shots-current
+
 
 # Node.js
 node_modules
 *.log
 npm-debug.log*
 .npm
+
 
 # IDE's
 .idea

@@ -1,0 +1,25 @@
+{
+  "sizes": ["320x480", "768x1024"],
+  "pages": [
+    {
+      "name": "homepage",
+      "url": "http://localhost:8080/",
+      "components": ["header", "footer"]
+    },
+    {
+      "name": "contact",
+      "url": "http://localhost:8080/contact.html",
+      "components": ["header", "footer"]
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer"
+    }
+  ]
+}

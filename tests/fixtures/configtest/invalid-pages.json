@@ -1,0 +1,19 @@
+{
+  "sizes": ["320x480", "1280x768"],
+  "pages": [
+    {
+      "name": "homepage",
+      "components": ["header", "footer"]
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer"
+    }
+  ]
+}

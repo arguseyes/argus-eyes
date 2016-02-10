@@ -1,0 +1,20 @@
+{
+  "sizes": ["320x480", 1024, "1280x768"],
+  "pages": [
+    {
+      "name": "homepage",
+      "url": "http://localhost:8080/",
+      "components": ["header", "footer"]
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer"
+    }
+  ]
+}
