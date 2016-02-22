@@ -1,35 +1,18 @@
-# argus-eyes
-[![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
-
-Build status:
+# [Argus Eyes](http://arguseyes.io/) [![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
 
 | Linux & Mac OS X | Windows |
 | --- | --- |
 | [![build status](https://travis-ci.org/branneman/argus-eyes.svg)](https://travis-ci.org/branneman/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/branneman/argus-eyes?branch=master&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
 
-<!-- start -->
 A lightweight commandline tool for visual regression testing of UI components.
-
-Argus-eyes does 3 things for you:  
-
-1. Take screenshots of UI components in different views and branches
-2. Test the screenshots for visual differences
-3. Create images of the visual differences
-
-Screenshots are caputured with [PhantomJS](http://phantomjs.org/), comparing sceenshots is done using
-[ImageMagick](http://www.imagemagick.org/).
-
-| Production version | Development version | Diff image |
-| --- |---| ---|
-| ![image 1](img/nav-menu-1.png) | ![image 2](img/nav-menu-2.png)| ![diff image](img/nav-menu-3.png) |
-<!-- end -->
 
 
 ## Contents
 
-- [Install](#install)
+- [Overview](#overview)
 - [Introduction](#introduction)
 - [Guide](#guide)
+  - [Install](#install)
   - [Step 1: Setup config file](#step-1-setup-config-file)
   - [Step 2: Take screenshots](#step-2-take-screenshots)
   - [Step 3: Test for visual differences](#step-3-test-for-visual-differences)
@@ -42,35 +25,37 @@ Screenshots are caputured with [PhantomJS](http://phantomjs.org/), comparing sce
 - [License](#license)
 
 
-## Install
+## Overview
+<!-- start -->
+Argus eyes does 3 things for you:
 
-- Install [Node.js](http://nodejs.org/), at least v4
-- Install [ImageMagick](http://www.imagemagick.org/)
-- Install argus-eyes using npm:
+1. Take screenshots of UI components in different views and branches
+2. Test the screenshots for visual differences
+3. Create images of the visual differences
 
-```
-$ npm install argus-eyes -g
-```
+Screenshots are caputured with [PhantomJS](http://phantomjs.org/), comparing sceenshots is done using
+[ImageMagick](http://www.imagemagick.org/).
+<!-- end -->
 
-*Note:* For OSX we recommend installing ImageMagick with [Homebrew](http://brew.sh/): `$ brew install imagemagick`
+![Argus Eyes Example](http://arguseyes.io/static/img/argus-eyes-example.png)
 
 
 <!-- start -->
 ## Introduction
 
-After installing, you want to tell argus-eyes which pages and which components to check for visual regression.
-Argus-eyes works by going over a straightforward JSON file containing the resolutions you want to capture, as well as
+After installing, you want to tell argus eyes which pages and which components to check for visual regression.
+Argus eyes works by going over a straightforward JSON file containing the resolutions you want to capture, as well as
 the pages with their url's, and the components with their CSS-selectors.
 
-Once argus-eyes knows where to find the components, it's time for some command line action. The first command you want
-to use is `$ argus-eyes add master`. This makes argus-eyes go over the config file and take screenshots of
+Once argus eyes knows where to find the components, it's time for some command line action. The first command you want
+to use is `$ argus-eyes add master`. This makes argus eyes go over the config file and take screenshots of
 all specified components in there. The screenshots are saved in **`.argus-eyes/master`** and this set of screenshots can
 be compared with another set.
 
 Say you want to compare the components in your dev branch with those in your master branch. Now is the time to switch
 branches and do a new `$ argus-eyes add dev`.
 
-To compare the 2 sets you run `$ argus-eyes compare master dev`, that's it! Argus-eyes now checks all supposedly
+To compare the 2 sets you run `$ argus-eyes compare master dev`, that's it! Argus eyes now checks all supposedly
 identical screenshots for visual differences. If differences were found, a new folder **`.argus-eyes/diff_master_dev`**
 is created. This folder contains overlay-images of the offending components, highlighting their differences in red.
 <!-- end -->
@@ -79,15 +64,30 @@ is created. This folder contains overlay-images of the offending components, hig
 <!-- start -->
 ## Guide
 
+### Install
+
+- Install [Node.js](http://nodejs.org/), at least v4
+- Install [ImageMagick](http://www.imagemagick.org/)
+- Install argus-eyes using npm:
+
+```bash
+$ npm install argus-eyes -g
+```
+
+*Note:*  
+For OSX we recommend installing ImageMagick with [Homebrew](http://brew.sh/): `$ brew install imagemagick`  
+For Windows we recommend install ImageMagick with [Chocolatey](https://chocolatey.org/): `$ choco install imagemagick`
+
+
 ### Step 1: Setup config file
 
-Before argus-eyes can measure visual differences, it needs a list of pages and components. By
-default argus-eyes expects an **`argus-eyes.json`** file in the current working directory.
+Before argus eyes can measure visual differences, it needs a list of pages and components. By
+default argus eyes expects an **`argus-eyes.json`** file in the current working directory.
 
 The config file must be a valid JSON object, containing 3 arrays: **`sizes`**, **`pages`** and
 **`components`**. Sizes are simple strings. Page objects require a name, url and list of components. Components require
 a name and a CSS-selector. Components can optionally take a list of selectors of elements to ignore, this selector is
-appended to the component selector. See the [Config](#config) section for a more detailed format description.
+appended to the component selector. See the Reference section for a more detailed format description.
 
 **Example config file:**
 ```json
@@ -116,7 +116,7 @@ appended to the component selector. See the [Config](#config) section for a more
 
 ### Step 2: Take screenshots
 
-After setting up the JSON, argus-eyes can be put to work. Let's create your first set of screenshots of the components
+After setting up the JSON, argus eyes can be put to work. Let's create your first set of screenshots of the components
 we specified. To do that, you can use the **`argus-eyes add`** command:
 
 ```bash
@@ -125,7 +125,7 @@ $ argus-eyes add <name>
 
 It's best to name your set of screenshots semantically, after your current git branch for example.
 
-Argus-eyes now creates a folder called **`.argus-eyes/<name>/`**, and saves the screenshots of all components specified
+Argus eyes now creates a folder called **`.argus-eyes/<name>/`**, and saves the screenshots of all components specified
 in the config file.
 
 Now, you can switch branches and save another set of screenshots.
@@ -133,7 +133,7 @@ Now, you can switch branches and save another set of screenshots.
 
 ### Step 3: Test for visual differences
 
-When any 2 sets of screenshots were created, argus-eyes can compare them for visual differences. Comparison is done with
+When any 2 sets of screenshots were created, argus eyes can compare them for visual differences. Comparison is done with
 the **`argus-eyes compare`** command:
 
 ```bash
@@ -147,7 +147,7 @@ _Note:_ Please make sure to add **`'.argus-eyes'`** to your **`.gitignore`**!
 
 ### Gitflow: Testing separate branches
 
-Argus-eyes is especially useful for checking visual regression between different branches. Say you're working on a
+Argus eyes is especially useful for checking visual regression between different branches. Say you're working on a
 feature branch and you want to make sure your changes have no unintended side effects:
 
 **On the `feature/navigation` branch:**
@@ -170,7 +170,7 @@ If any differences are found, the visual diff images are stored in **`.argus-eye
 
 ### Config
 
-Argus-eyes will look in the current working directory for a file named **`argus-eyes.json`**. This file contains your
+Argus eyes will look in the current working directory for a file named **`argus-eyes.json`**. This file contains your
 sizes, pages and components. You can specify a different location file using the **`--config`** argument, as described
 in [Options](#options).
 
@@ -217,16 +217,16 @@ thus an entire function body is expected and multiple lines are allowed.
 
 ### Usage
 
-#### `argus-eyes add <name>`
+#### Add
 
-Run argus-eyes and save all the screenshots under **`.argus-eyes/<name>/`**
+Run argus eyes and save all the screenshots under **`.argus-eyes/<name>/`**
 
-#### `argus-eyes compare <name1> <name2>`
+#### Compare
 
 Compare the two sets of screenshots, creating overlay-images and reporting any difference. The process will exit with
 code 0 when no significant differences were found, code 1 when differences were found.
 
-#### `argus-eyes configtest`
+#### Configtest
 
 Run a config file syntax and test. It parses the config file and either reports *Config valid* or detailed information
 about the error.
@@ -234,10 +234,10 @@ about the error.
 
 ### Options
 
-Argus-eyes can take several optional arguments on the CLI. Because `add` and `compare` take positional arguments, any
+Argus eyes can take several optional arguments on the CLI. Because `add` and `compare` take positional arguments, any
 of these options must be placed last.
 
-#### `--config=…`
+#### Config file
 
 _Default:_ **`argus-eyes.json`**
 
@@ -247,14 +247,14 @@ Use a different config file.
 $ argus-eyes add feature/navigation --config=config.json
 ```
 
-#### **`--threshold=…`**
+#### Threshold
 
 _Default:_ 2
 
 Set the threshold for comparison differences, expects a percentage between 0 and 100. If the difference between 2 files
 is bigger than this percentage, it will be treated as different and reported as such.
 
-When comparing screenshots, argus-eyes checks if all pixels in screenshots are identical. The difference is calculated
+When comparing screenshots, argus eyes checks if all pixels in screenshots are identical. The difference is calculated
 by dividing the number of different pixels by the total number of pixels, giving a percentage. The image is considered
 different when this percentage exceeds the threshold percentage.
 
@@ -265,7 +265,7 @@ increasing the threshold, since that will also increase the chance of unintended
 $ argus-eyes compare develop feature/navigation --threshold=10
 ```
 
-#### **`--base=…`**
+#### Base
 
 _Default:_ **`.argus-eyes`**
 
@@ -275,7 +275,7 @@ Use a different base directory for storing the screenshots and comparison result
 $ argus-eyes add develop --base==visual-regression
 ```
 
-#### **`--im=…`**
+#### ImageMagick
 
 Set the path where the ImageMagick `compare`, `convert` and `identify` executables can be found. This path needs to end
 with a slash (or backslash on Windows). It is empty by default, expecting the executables in your `PATH` variable.
@@ -285,7 +285,7 @@ $ argus-eyes add develop --im="/usr/local/Cellar/imagemagick/6.9.2-5/bin/"
 $ argus-eyes add develop --im="C:\Program Files\ImageMagick\"
 ```
 
-#### **`--verbose`**
+#### Verbose
 
 Turn on verbose output.
 
@@ -293,7 +293,7 @@ Turn on verbose output.
 $ argus-eyes compare develop feature/navigation --verbose
 ```
 
-#### **`--no-color`**
+#### No color
 
 Turn off colored output. Output is colored by default.
 
@@ -301,7 +301,7 @@ Turn off colored output. Output is colored by default.
 $ argus-eyes add develop --no-color
 ```
 
-#### **`--help`**
+#### Help
 
 Print usage information.
 
@@ -309,7 +309,7 @@ Print usage information.
 $ argus-eyes --help
 ```
 
-#### **`--version`**
+#### Version
 
 Print version.
 
