@@ -249,7 +249,7 @@ $ argus-eyes add feature/navigation --config=config.json
 
 #### Threshold
 
-_Default:_ 2
+_Default:_ 0
 
 Set the threshold for comparison differences, expects a percentage between 0 and 100. If the difference between 2 files
 is bigger than this percentage, it will be treated as different and reported as such.

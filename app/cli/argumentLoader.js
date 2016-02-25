@@ -23,7 +23,7 @@ var _defaultConfig = {
     base: process.cwd() + '/.argus-eyes',
     verbose: false,
     color: true,
-    threshold: 2,
+    threshold: 0,
     im: ''
 };
 

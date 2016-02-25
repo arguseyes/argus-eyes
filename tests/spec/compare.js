@@ -28,7 +28,7 @@ describe('Action: Compare', function() {
 
     });
 
-    it('should pass scenario: effectively equal captures', function() {
+    it('should fail scenario: effectively equal captures', function() {
 
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
@@ -36,6 +36,24 @@ describe('Action: Compare', function() {
             'baseline',
             'current',
             '--verbose',
+            '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
+        ], { encoding: 'utf8' });
+
+        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
+
+    });
+
+    it('should pass scenario: effectively equal captures with custom threshold', function() {
+
+        var proc = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'current',
+            '--verbose',
+            '--threshold=2',
             '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
         ], { encoding: 'utf8' });
