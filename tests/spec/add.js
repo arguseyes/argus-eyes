@@ -61,11 +61,14 @@ describe('Action: Add', function() {
             'baseline',
             'test-generated',
             '--config=' + normalize(__dirname + '/../fixtures/add/known-positives/known-positives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives')
+            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives'),
+            '--verbose'
         ], { encoding: 'utf8' });
 
         assert.equal(procAdd.status, 0, procAdd.stdout);
         assert.equal(procCompare.status, 0, procCompare.stdout);
+        console.log('lol!');
+        process.exit();
 
     });
 
@@ -85,7 +88,8 @@ describe('Action: Add', function() {
             'baseline',
             'test-generated',
             '--config=' + normalize(__dirname + '/../fixtures/add/known-negatives/known-negatives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives')
+            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives'),
+            '--verbose'
         ], { encoding: 'utf8' });
 
         assert.equal(procAdd.status, 0, procAdd.stdout);
