@@ -15,7 +15,7 @@
   "engines": {
     "node": ">=4.0"
   },
-  "engineStrict": true,
+  "engine-strict": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arguseyes/argus-eyes.git"
