@@ -94,7 +94,7 @@ function getConfig() {
 
     var config = Object.assign({}, _defaultConfig);
 
-    if (argv.config) {
+    if (typeof argv.config !== 'undefined') {
         if (path.isAbsolute(argv.config)) {
             config.config = argv.config;
         } else {
@@ -102,7 +102,7 @@ function getConfig() {
         }
     }
 
-    if (argv.base) {
+    if (typeof argv.base !== 'undefined') {
         if (path.isAbsolute(argv.base)) {
             config.base = argv.base;
         } else {
@@ -118,14 +118,14 @@ function getConfig() {
         config.color = false;
     }
 
-    if (argv.threshold) {
+    if (typeof argv.threshold !== 'undefined') {
         config.threshold = parseFloat(argv.threshold);
         if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
             throw new Error('Incorrect threshold given');
         }
     }
 
-    if (argv.im) {
+    if (typeof argv.im !== 'undefined') {
         config.im = argv.im;
     }
     var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
