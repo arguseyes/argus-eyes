@@ -19,6 +19,8 @@ install:
 test_script:
   - node --version
   - npm --version
+  - node -e "console.log(require('child_process').execFileSync(require('phantomjs-prebuilt').path, ['-v'], {encoding:'utf8'}));"
+  - convert --version
   - npm test
 
 # Don't actually build
