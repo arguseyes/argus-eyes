@@ -1,9 +1,10 @@
 {
   "sizes": ["768x1024"],
+  "finished-when": "return !!window._finishedWhen;",
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:8080/index-no-fonts.html",
+      "url": "http://localhost:8080/index-finished-when.html",
       "components": ["header", "footer"]
     }
   ],

@@ -61,14 +61,11 @@ describe('Action: Add', function() {
             'baseline',
             'test-generated',
             '--config=' + normalize(__dirname + '/../fixtures/add/known-positives/known-positives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives'),
-            '--verbose'
+            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives')
         ], { encoding: 'utf8' });
 
         assert.equal(procAdd.status, 0, procAdd.stdout);
         assert.equal(procCompare.status, 0, procCompare.stdout);
-        console.log('lol!');
-        process.exit();
 
     });
 
@@ -88,13 +85,36 @@ describe('Action: Add', function() {
             'baseline',
             'test-generated',
             '--config=' + normalize(__dirname + '/../fixtures/add/known-negatives/known-negatives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives'),
-            '--verbose'
+            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives')
         ], { encoding: 'utf8' });
 
         assert.equal(procAdd.status, 0, procAdd.stdout);
         assert.equal(procCompare.status, 1, procCompare.stdout);
         assert.equal(/Found 1 difference/.test(procCompare.stdout), true, procCompare.stdout);
+
+    });
+
+    it('should wait for finished-when', function() {
+
+        var procAdd = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'add',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/add/finished-when/finished-when.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/add/finished-when')
+        ], { encoding: 'utf8' });
+
+        var procCompare = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/add/finished-when/finished-when.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/add/finished-when')
+        ], { encoding: 'utf8' });
+
+        assert.equal(procAdd.status, 0, procAdd.stdout);
+        assert.equal(procCompare.status, 0, procCompare.stdout);
 
     });
 

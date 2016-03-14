@@ -3,7 +3,7 @@
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:8080/",
+      "url": "http://localhost:8080/index-no-fonts.html",
       "components": ["header", "footer"]
     }
   ],
