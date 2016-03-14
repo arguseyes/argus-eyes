@@ -9,7 +9,7 @@ var page   = require('webpage').create();
 
 // Configuration
 var currentTries = 0;
-var maxTries     = 20;
+var maxTries     = 50;
 var tryTimeout   = 100;
 
 // CLI Arguments
@@ -60,7 +60,7 @@ page.open(url, function(status) {
         } else if (currentTries < maxTries) {
             setTimeout(waitForLoad, tryTimeout);
         } else {
-            console.log('document.readyState not \'completed\', timed out after ' + maxTries + ' tries.');
+            console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout / 1e3) + 'ms.');
             phantom.exit(1);
         }
     }
@@ -83,7 +83,7 @@ page.open(url, function(status) {
         } else if (currentTries < maxTries) {
             setTimeout(waitForUserScript, tryTimeout);
         } else {
-            console.log('finished-when userscript still not completed, timed out after ' + maxTries + ' tries.');
+            console.log('finished-when userscript still not completed, timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
             phantom.exit(1);
         }
     }
@@ -118,7 +118,7 @@ page.open(url, function(status) {
         } else if (currentTries < maxTries) {
             setTimeout(tryRemoveIgnores, tryTimeout);
         } else {
-            console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + maxTries + ' tries.');
+            console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
             phantom.exit(1);
         }
     }
@@ -157,7 +157,7 @@ page.open(url, function(status) {
         } else if (currentTries < maxTries) {
             return setTimeout(tryClipRect, tryTimeout);
         } else {
-            console.log('Unable to clip element \'' + sel + '\' at address: ' + url + ', timed out after ' + maxTries + ' tries.');
+            console.log('Unable to clip element \'' + sel + '\' at address: ' + url + ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
             phantom.exit(1);
         }
     }
@@ -175,7 +175,7 @@ page.open(url, function(status) {
         } else if (currentTries < maxTries) {
             setTimeout(tryScreenshot, tryTimeout);
         } else {
-            console.log('Unable to write file: \'' + file + '\', timed out after ' + maxTries + ' tries.');
+            console.log('Unable to write file: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
             phantom.exit(1);
         }
     }
