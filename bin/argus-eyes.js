@@ -7,7 +7,7 @@ var pkg            = require('../package');
 var log            = require('../app/log');
 var argumentLoader = require('../app/cli/argumentLoader');
 var userCfgLoader  = require('../app/cli/userConfigLoader');
-var actionAdd      = require('../app/action-add');
+var actionCapture  = require('../app/action-capture');
 var actionCompare  = require('../app/action-compare');
 
 // Parse cli arguments into action & config
@@ -24,10 +24,10 @@ try {
 // Run action
 switch (action[0]) {
 
-    case 'add':
+    case 'capture':
         try {
             userCfgLoader.getUserConfig();
-            process.exit(actionAdd(action[1]) ? 0 : 1);
+            process.exit(actionCapture(action[1]) ? 0 : 1);
         } catch (e) {
             log.error('Error: ' + e.message);
         }
@@ -62,7 +62,7 @@ switch (action[0]) {
     case 'help':
         log.info(
             '\nUsage:\n' +
-            ' argus-eyes add <name>                Take new screenshots, save set as <name>\n' +
+            ' argus-eyes capture <name>            Capture new screenshots, save set as <name>\n' +
             ' argus-eyes compare <left> <right>    Compare 2 sets of screenshots by name\n' +
             ' argus-eyes configtest                Test the config file\n' +
             '\nOptions:\n' +

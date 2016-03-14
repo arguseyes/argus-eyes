@@ -48,12 +48,12 @@ Argus eyes works by going over a straightforward JSON file containing the resolu
 the pages with their url's, and the components with their CSS-selectors.
 
 Once argus eyes knows where to find the components, it's time for some command line action. The first command you want
-to use is `$ argus-eyes add master`. This makes argus eyes go over the config file and take screenshots of
+to use is `$ argus-eyes capture master`. This makes argus eyes go over the config file and take screenshots of
 all specified components in there. The screenshots are saved in **`.argus-eyes/master`** and this set of screenshots can
 be compared with another set.
 
 Say you want to compare the components in your dev branch with those in your master branch. Now is the time to switch
-branches and do a new `$ argus-eyes add dev`.
+branches and do a new `$ argus-eyes capture dev`.
 
 To compare the 2 sets you run `$ argus-eyes compare master dev`, that's it! Argus eyes now checks all supposedly
 identical screenshots for visual differences. If differences were found, a new folder **`.argus-eyes/diff_master_dev`**
@@ -117,10 +117,10 @@ appended to the component selector. See the Reference section for a more detaile
 ### Step 2: Take screenshots
 
 After setting up the JSON, argus eyes can be put to work. Let's create your first set of screenshots of the components
-we specified. To do that, you can use the **`argus-eyes add`** command:
+we specified. To do that, you can use the **`argus-eyes capture`** command:
 
 ```bash
-$ argus-eyes add <name>
+$ argus-eyes capture <name>
 ```
 
 It's best to name your set of screenshots semantically, after your current git branch for example.
@@ -152,12 +152,12 @@ feature branch and you want to make sure your changes have no unintended side ef
 
 **On the `feature/navigation` branch:**
 ```bash
-$ argus-eyes add feature/navigation
+$ argus-eyes capture feature/navigation
 ```
 
 **On the `develop` branch:**
 ```bash
-$ argus-eyes add develop
+$ argus-eyes capture develop
 $ argus-eyes compare develop feature/navigation
 ```
 
@@ -217,7 +217,7 @@ thus an entire function body is expected and multiple lines are allowed.
 
 ### Usage
 
-#### Add
+#### Capture
 
 Run argus eyes and save all the screenshots under **`.argus-eyes/<name>/`**
 
@@ -234,7 +234,7 @@ about the error.
 
 ### Options
 
-Argus eyes can take several optional arguments on the CLI. Because `add` and `compare` take positional arguments, any
+Argus eyes can take several optional arguments on the CLI. Because `capture` and `compare` take positional arguments, any
 of these options must be placed last.
 
 #### Config file
@@ -244,7 +244,7 @@ _Default:_ **`argus-eyes.json`**
 Use a different config file.
 
 ```bash
-$ argus-eyes add feature/navigation --config=config.json
+$ argus-eyes capture feature/navigation --config=config.json
 ```
 
 #### Threshold
@@ -272,7 +272,7 @@ _Default:_ **`.argus-eyes`**
 Use a different base directory for storing the screenshots and comparison results.
 
 ```bash
-$ argus-eyes add develop --base==visual-regression
+$ argus-eyes capture develop --base==visual-regression
 ```
 
 #### ImageMagick
@@ -281,8 +281,8 @@ Set the path where the ImageMagick `compare`, `convert` and `identify` executabl
 with a slash (or backslash on Windows). It is empty by default, expecting the executables in your `PATH` variable.
 
 ```bash
-$ argus-eyes add develop --im="/usr/local/Cellar/imagemagick/6.9.2-5/bin/"
-$ argus-eyes add develop --im="C:\Program Files\ImageMagick\"
+$ argus-eyes capture develop --im="/usr/local/Cellar/imagemagick/6.9.2-5/bin/"
+$ argus-eyes capture develop --im="C:\Program Files\ImageMagick\"
 ```
 
 #### Verbose
@@ -298,7 +298,7 @@ $ argus-eyes compare develop feature/navigation --verbose
 Turn off colored output. Output is colored by default.
 
 ```bash
-$ argus-eyes add develop --no-color
+$ argus-eyes capture develop --no-color
 ```
 
 #### Help

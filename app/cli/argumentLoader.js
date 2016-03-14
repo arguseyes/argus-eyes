@@ -43,9 +43,9 @@ function getAction() {
     // yargs positional arguments
     var posArgs = argv._;
 
-    // `argus-eyes add <name>`
-    if (posArgs.length === 2 && posArgs[0] === 'add') {
-        return ['add', posArgs[1]];
+    // `argus-eyes capture <name>`
+    if (posArgs.length === 2 && (posArgs[0] === 'capture' || posArgs[0] === 'add')) {
+        return ['capture', posArgs[1]];
     }
 
     // `argus-eyes compare <name1> <name2>`

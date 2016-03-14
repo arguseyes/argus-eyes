@@ -4,13 +4,13 @@ var normalize = require('path').normalize;
 var glob = require('glob').sync;
 var rimraf = require('rimraf').sync;
 
-describe('Action: Add', function() {
+describe('Action: Capture', function() {
 
     var cleanDirectories = function() {
         rimraf(normalize(__dirname + '/../../.argus-eyes'));
         rimraf(normalize(__dirname + '/../../.argus-eyes-custom-dir'));
-        rimraf(normalize(__dirname + '/../fixtures/add/*/test-generated'));
-        rimraf(normalize(__dirname + '/../fixtures/add/*/diff_baseline_test-generated'));
+        rimraf(normalize(__dirname + '/../fixtures/capture/*/test-generated'));
+        rimraf(normalize(__dirname + '/../fixtures/capture/*/diff_baseline_test-generated'));
     };
     beforeEach(cleanDirectories);
     afterEach(cleanDirectories);
@@ -19,9 +19,9 @@ describe('Action: Add', function() {
 
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test',
-            '--config=' + normalize(__dirname + '/../fixtures/add/valid.json')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json')
         ], { encoding: 'utf8' });
 
         // Assert correct exitcode
@@ -47,12 +47,12 @@ describe('Action: Add', function() {
 
     it('should pass scenario: taken captures should match known positives', function() {
 
-        var procAdd = spawnSync('node', [
+        var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/known-positives/known-positives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/known-positives/known-positives.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/known-positives')
         ], { encoding: 'utf8' });
 
         var procCompare = spawnSync('node', [
@@ -60,23 +60,23 @@ describe('Action: Add', function() {
             'compare',
             'baseline',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/known-positives/known-positives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-positives')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/known-positives/known-positives.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/known-positives')
         ], { encoding: 'utf8' });
 
-        assert.equal(procAdd.status, 0, procAdd.stdout);
+        assert.equal(procCapture.status, 0, procCapture.stdout);
         assert.equal(procCompare.status, 0, procCompare.stdout);
 
     });
 
     it('should fail scenario: taken captures should not match known negatives', function() {
 
-        var procAdd = spawnSync('node', [
+        var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/known-negatives/known-negatives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/known-negatives/known-negatives.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/known-negatives')
         ], { encoding: 'utf8' });
 
         var procCompare = spawnSync('node', [
@@ -84,11 +84,11 @@ describe('Action: Add', function() {
             'compare',
             'baseline',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/known-negatives/known-negatives.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/known-negatives')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/known-negatives/known-negatives.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/known-negatives')
         ], { encoding: 'utf8' });
 
-        assert.equal(procAdd.status, 0, procAdd.stdout);
+        assert.equal(procCapture.status, 0, procCapture.stdout);
         assert.equal(procCompare.status, 1, procCompare.stdout);
         assert.equal(/Found 1 difference/.test(procCompare.stdout), true, procCompare.stdout);
 
@@ -96,12 +96,12 @@ describe('Action: Add', function() {
 
     it('should wait for finished-when', function() {
 
-        var procAdd = spawnSync('node', [
+        var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/finished-when/finished-when.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
         ], { encoding: 'utf8' });
 
         var procCompare = spawnSync('node', [
@@ -109,11 +109,11 @@ describe('Action: Add', function() {
             'compare',
             'baseline',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/add/finished-when/finished-when.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/add/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
         ], { encoding: 'utf8' });
 
-        assert.equal(procAdd.status, 0, procAdd.stdout);
+        assert.equal(procCapture.status, 0, procCapture.stdout);
         assert.equal(procCompare.status, 0, procCompare.stdout);
 
     });
@@ -122,9 +122,9 @@ describe('Action: Add', function() {
 
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test1/test2',
-            '--config=' + normalize(__dirname + '/../fixtures/add/valid.json')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json')
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 0, proc.stdout);
@@ -136,9 +136,9 @@ describe('Action: Add', function() {
 
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
-            'add',
+            'capture',
             'test',
-            '--config=' + normalize(__dirname + '/../fixtures/add/valid.json'),
+            '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json'),
             '--base=' + normalize(__dirname + '/../../.argus-eyes-custom-dir')
         ], { encoding: 'utf8' });
 

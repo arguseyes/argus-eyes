@@ -8,13 +8,13 @@ var phantomjsPath  = require('phantomjs-prebuilt').path;
 var rimraf         = require('rimraf').sync;
 
 /**
- * Action `add`
- *  Takes screenshots for all pages & components specified in `config`
+ * Action `capture`
+ *  Captures screenshots for all pages & components specified in `config`
  *
  * @param {String} id - The identifier for this set of screenshots
  * @returns {Boolean}
  */
-module.exports = function add(id) {
+module.exports = function capture(id) {
 
     var config = argumentLoader.getConfig();
     var userConfig = userCfgLoader.getUserConfig();
