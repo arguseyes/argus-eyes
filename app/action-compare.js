@@ -157,25 +157,39 @@ function showDirectoryDifferenceWarnings(dir1, dir2, id1, id2) {
         'Found a total of %d screenshot%s on the right side',
         dir2.length,
         util.plural(dir2.length)));
-    getDirectoryDiff(dir1, id1, id2, file => log.warning('Screenshot not found in right side: ' + file));
-    getDirectoryDiff(dir2, id2, id1, file => log.warning('Screenshot not found in left side: ' + file));
+    getDirectoryDiff(dir1, id2, file => log.warning('Screenshot not found in right side: ' + file));
+    getDirectoryDiff(dir2, id1, file => log.warning('Screenshot not found in left side: ' + file));
 }
 
 /**
  * Invokes a callback for every file that does not exist in the right side of the comparison
  *
  * @param {String[]} dir - List of files in the left directory
- * @param {String} id1 - Identifier of the left directory
  * @param {String} id2 - Identifier of the right directory
  * @param {Function} cb - Callback for each difference, passed a single argument, the file
  */
-function getDirectoryDiff(dir, id1, id2, cb) {
+function getDirectoryDiff(dir, id2, cb) {
     dir.forEach(file1 => {
-        var file2 = file1.replace(id1, id2);
+        var file2 = mapFileToSet(file1, id2);
         if (!util.fileExists(file2)) {
             cb(file2);
         }
     });
+}
+
+/**
+ * Safely map a fullpath to a file in set1 to set2
+ *
+ * @param {String} file1 - Full path to file
+ * @param {String} id2 - Identifier of the right directory
+ */
+function mapFileToSet(file1, id2) {
+    var dir  = path.dirname(file1);
+    var file = path.basename(file1);
+    var page = path.basename(dir);
+    var size = path.basename(path.resolve(dir, '../'));
+    var base = path.resolve(dir, '../../../');
+    return [base, id2, size, page, file].join('/');
 }
 
 /**
