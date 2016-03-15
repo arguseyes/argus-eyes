@@ -6,6 +6,8 @@ var fs             = require('fs');
 var path           = require('path');
 var glob           = require('glob').sync;
 var rimraf         = require('rimraf').sync;
+var BlinkDiff      = require('blink-diff');
+var PNGImage       = require('pngjs-image');
 
 /**
  * Action `compare`
@@ -54,68 +56,41 @@ module.exports = function compare(id1, id2) {
 
         util.mkdir(path.dirname(diffFile));
 
-        var sizes1 = getImageSize(file1);
-        var sizes2 = getImageSize(file2);
-        if (!sizes1 || !sizes2) {
-            log.error('Could not probe both left and right for image dimensions: ' + filename);
+        var diff = new BlinkDiff({
+            imageAPath: file1,
+            imageBPath: file2,
+            imageOutputPath: diffFile,
+            threshold: 0,
+            delta: 0,
+            outputMaskOpacity: 1,
+            composition: false
+        });
+        try {
+            var result = diff.runSync();
+        } catch (e) {
+            log.warning(util.format("Image comparison returned an error for file: '%s'", filename));
+            log.warning(util.prefixStdStream(' blinkdiff', JSON.stringify(e)));
             return;
         }
 
-        // Resize image if it's smaller
-        var fileResized = false;
-        if (sizes1[0] !== sizes2[0] || sizes1[1] !== sizes2[1]) {
+        var img1 = PNGImage.readImageSync(file1);
+        var img2 = PNGImage.readImageSync(file2);
+        if (img1.getWidth() !== img2.getWidth() || img1.getHeight() !== img2.getHeight()) {
             log.verbose('Image dimensions differ left and right: ' + filename);
-            try {
-                if (isSmallest(sizes1, sizes2)) {
-                    fileResized = file1 = resizeTo(file1, sizes2);
-                } else {
-                    fileResized = file2 = resizeTo(file2, sizes1);
-                }
-            } catch (e) {
-                differences++;
-                log.error('Could not resize smaller image: ' + filename);
-                return;
-            }
-        }
-
-        // Execute ImageMagick `compare` command
-        var command = config.im + 'compare';
-        var args = [file1, file2, '-metric', 'AE', diffFile];
-        var proc = child_process.spawnSync(command, args, { encoding: 'utf8' });
-
-        // Remove temporary image
-        if (fileResized && util.fileExists(fileResized)) {
-            fs.unlinkSync(fileResized);
         }
 
         // Dropout on success
-        if (proc.status === 0 && !proc.error && proc.stderr === '0') {
+        if (result.differences === 0) {
             fs.unlinkSync(diffFile);
             log.verbose(util.format("Found exactly equal: '%s'", filename));
             return;
         }
 
-        // Dropout on ImageMagick error
-        //  `compare` exit code 0 means equal, 1 means different, all else is an error
-        if (proc.status !== 0 && proc.status !== 1) {
-            log.warning(util.format("ImageMagick exited with code %d for file: '%s'", proc.status, filename));
-            log.warning(util.prefixStdStream(' stderr', proc.stderr));
-            return;
-        }
-
-        // Dropout on OS error
-        if (proc.error) {
-            log.warning(util.format("ImageMagick could not be started for file: '%s'", filename));
-            log.verbose(' ' + JSON.stringify(proc.error));
-            log.warning(util.prefixStdStream(' stderr', proc.stderr));
-            return;
-        }
-
         // What percentage of pixels changed?
-        var pixelsChanged = parseInt(proc.stderr.trim(), 10);
-        var percentage = (pixelsChanged / (sizes1[0] * sizes1[1]) * 100);
+        var pixelsChanged = result.differences;
+        var percentage = (pixelsChanged / (result.width * result.height) * 100);
 
-        // Report when verbose and remove diff image when necessary
+        // Report when verbose
         if (pixelsChanged > 0 && percentage > config.threshold) {
             differences++;
             log.verbose(util.format(
@@ -190,70 +165,6 @@ function mapFileToSet(file1, id2) {
     var size = path.basename(path.resolve(dir, '../'));
     var base = path.resolve(dir, '../../../');
     return [base, id2, size, page, file].join('/');
-}
-
-/**
- * Returns the dimensions of an image file
- *
- * @todo Refactor execSync to spawnSync
- * @param {String} file - The full path to an image file
- * @returns {[Number, Number] | Boolean}
- */
-function getImageSize(file) {
-
-    var config = argumentLoader.getConfig();
-
-    var command = util.format(
-        '"%s" -ping -format "%w %h" "%s"',
-        util.escape(config.im + 'identify'),
-        util.escape(file));
-
-    try {
-        var sizes = child_process.execSync(command, { encoding: 'utf8' });
-        return sizes.trim().split(' ').map(num => parseInt(num, 10));
-    } catch (e) {
-        return false;
-    }
-}
-
-/**
- * Is `file1` smaller than `file2` in image dimensions?
- *
- * @param {[Number, Number]} sizes1 - Dimensions of the left file
- * @param {[Number, Number]} sizes2 - Dimensions of the right file
- * @returns {Boolean}
- */
-function isSmallest(sizes1, sizes2) {
-    return (sizes1[0] * sizes1[1]) < (sizes2[0] * sizes2[1]);
-}
-
-/**
- * Resize an image to specified dimensions
- *
- * @todo Refactor execSync to spawnSync
- * @param {String} file - Left filename
- * @param {[Number, Number]} sizes - Dimensions of the left file
- * @throws {Error}
- * @returns {String} - The filename of the just created file
- */
-function resizeTo(file, sizes) {
-
-    var config    = argumentLoader.getConfig();
-    var imConvert = config.im + 'convert';
-    var newName   = file + '.tmp.png';
-    var newSizes  = sizes[0] + 'x' + sizes[1];
-
-    log.verbose("Resizing '" + path.relative(process.cwd(), file) + "' to " + newSizes);
-
-    var command = util.format(
-        '"%s" "%s" -background transparent -extent %s "%s"',
-        util.escape(imConvert),
-        util.escape(file),
-        newSizes,
-        util.escape(newName));
-    child_process.execSync(command);
-
-    return newName;
 }
 
 /**

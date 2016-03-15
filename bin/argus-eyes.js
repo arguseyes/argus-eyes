@@ -69,7 +69,6 @@ switch (action[0]) {
             " --config=…                           Specify config file, defaults to 'argus-eyes.json'\n" +
             " --base=…                             Set base for storing and comparing image sets, defaults to '.argus-eyes'\n" +
             ' --threshold=…                        Set the threshold for comparison differences, number between 0 and 100\n' +
-            ' --im=…                               ImageMagick base path\n' +
             ' --verbose                            Turn on verbose output\n' +
             ' --no-color                           Turn off colored output\n' +
             ' --help                               Print usage information\n' +

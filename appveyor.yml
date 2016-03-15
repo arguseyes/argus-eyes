@@ -8,19 +8,14 @@ environment:
 
 # Install scripts
 install:
-  - ps: |
-      choco install imagemagick -y
-      $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + `
-        ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
   - ps: Install-Product node $env:nodejs_version
   - npm install
+  - node --version
+  - npm --version
+  - node -e "console.log(require('child_process').execFileSync(require('phantomjs-prebuilt').path, ['--version'], {encoding:'utf8'}));"
 
 # Application test scripts
 test_script:
-  - node --version
-  - npm --version
-  - node -e "console.log(require('child_process').execFileSync(require('phantomjs-prebuilt').path, ['-v'], {encoding:'utf8'}));"
-  - convert --version
   - npm test
 
 # Don't actually build

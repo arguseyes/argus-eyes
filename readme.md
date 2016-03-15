@@ -34,7 +34,7 @@ Argus eyes does 3 things for you:
 3. Create images of the visual differences
 
 Screenshots are caputured with [PhantomJS](http://phantomjs.org/), comparing sceenshots is done using
-[ImageMagick](http://www.imagemagick.org/).
+[Blink-diff](http://yahoo.github.io/blink-diff/).
 <!-- end -->
 
 ![Argus Eyes Example](http://arguseyes.io/static/img/argus-eyes-example.png)
@@ -67,16 +67,11 @@ is created. This folder contains overlay-images of the offending components, hig
 ### Install
 
 - Install [Node.js](http://nodejs.org/), at least v4
-- Install [ImageMagick](http://www.imagemagick.org/)
 - Install argus-eyes using npm:
 
 ```bash
 $ npm install argus-eyes -g
 ```
-
-*Note:*  
-For OSX we recommend installing ImageMagick with [Homebrew](http://brew.sh/): `$ brew install imagemagick`  
-For Windows we recommend install ImageMagick with [Chocolatey](https://chocolatey.org/): `$ choco install imagemagick`
 
 
 ### Step 1: Setup config file
@@ -273,16 +268,6 @@ Use a different base directory for storing the screenshots and comparison result
 
 ```bash
 $ argus-eyes capture develop --base==visual-regression
-```
-
-#### ImageMagick
-
-Set the path where the ImageMagick `compare`, `convert` and `identify` executables can be found. This path needs to end
-with a slash (or backslash on Windows). It is empty by default, expecting the executables in your `PATH` variable.
-
-```bash
-$ argus-eyes capture develop --im="/usr/local/Cellar/imagemagick/6.9.2-5/bin/"
-$ argus-eyes capture develop --im="C:\Program Files\ImageMagick\"
 ```
 
 #### Verbose

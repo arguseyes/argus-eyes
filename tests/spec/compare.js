@@ -1,4 +1,5 @@
 var assert = require('assert');
+var glob = require('glob').sync;
 var spawnSync = require('child_process').spawnSync;
 var normalize = require('path').normalize;
 var rimraf = require('rimraf').sync;
@@ -35,7 +36,6 @@ describe('Action: Compare', function() {
             'compare',
             'baseline',
             'current',
-            '--verbose',
             '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
         ], { encoding: 'utf8' });
@@ -66,34 +66,43 @@ describe('Action: Compare', function() {
 
     it('should fail scenario: unequal captures', function() {
 
+        var dir = '/../fixtures/compare/known-negatives';
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'compare',
             'baseline',
             'current',
             '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/compare/known-negatives')
+            '--base=' + normalize(__dirname + dir)
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 1, proc.stdout);
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
+
+        var diff = glob(normalize(__dirname + dir + '/diff_baseline_current/768x1024/homepage/footer.png')).length;
+        assert.equal(diff, 1, 'Diff file was not created!');
 
     });
 
     it('should pass scenario: unequal captures with custom theshold', function() {
 
+        var dir = '/../fixtures/compare/known-positives-effectively';
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'compare',
             'baseline',
             'current',
-            '--threshold=0.05',
+            '--threshold=0.01',
             '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
+            '--base=' + normalize(__dirname + dir),
+            '--verbose'
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 1, proc.stdout);
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
+
+        var diff = glob(normalize(__dirname + dir + '/diff_baseline_current/768x1024/homepage/footer.png')).length;
+        assert.equal(diff, 1, 'Diff file was not created!');
 
     });
 
@@ -112,12 +121,12 @@ describe('Action: Compare', function() {
         assert.equal(proc.status, 0, proc.stdout);
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
         assert.equal(/dimensions differ/.test(proc.stdout), true, "string not found: 'dimensions differ'");
-        assert.equal(/resizing/i.test(proc.stdout), true, "string not found: 'resizing'");
 
     });
 
     it('should fail scenario: unequal captures of different sizes', function() {
 
+        var dir = '/../fixtures/compare/known-negatives-different-sizes';
         var proc = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'compare',
@@ -125,13 +134,15 @@ describe('Action: Compare', function() {
             'current',
             '--verbose',
             '--config=' + normalize(__dirname + '/../fixtures/compare/valid.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/compare/known-negatives-different-sizes')
+            '--base=' + normalize(__dirname + dir)
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 1, proc.stdout);
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
         assert.equal(/dimensions differ/.test(proc.stdout), true, "string not found: 'dimensions differ'");
-        assert.equal(/resizing/i.test(proc.stdout), true, "string not found: 'resizing'");
+
+        var diff = glob(normalize(__dirname + dir + '/diff_baseline_current/768x1024/homepage/footer.png')).length;
+        assert.equal(diff, 1, 'Diff file was not created!');
 
     });
 
@@ -187,6 +198,5 @@ describe('Action: Compare', function() {
 
     // @todo Implement
     xit('should not leave empty directories', function() {});
-    xit('should handle a specified imagemagick path', function() {});
 
 });

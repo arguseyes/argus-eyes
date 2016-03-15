@@ -23,8 +23,7 @@ var _defaultConfig = {
     base: process.cwd() + '/.argus-eyes',
     verbose: false,
     color: true,
-    threshold: 0,
-    im: ''
+    threshold: 0
 };
 
 /**
@@ -79,8 +78,7 @@ function getAction() {
  *   base: String,
  *   verbose: Boolean,
  *   color: Boolean,
- *   threshold: Number,
- *   im: String
+ *   threshold: Number
  * }} Config
  * @throws {Error}
  * @returns {Config} - The final config
@@ -123,22 +121,6 @@ function getConfig() {
         if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
             throw new Error('Incorrect threshold given');
         }
-    }
-
-    if (typeof argv.im !== 'undefined') {
-        config.im = argv.im;
-    }
-    var imCompare  = util.isExecutable(config.im + 'compare', ['-version']);
-    var imConvert  = util.isExecutable(config.im + 'convert', ['-version']);
-    var imIdentify = util.isExecutable(config.im + 'identify', ['-version']);
-    if (!imCompare && !imConvert && !imIdentify) {
-        throw new Error('ImageMagick executables not found');
-    } else if (!imCompare) {
-        throw new Error('ImageMagick executable not found: `compare`');
-    } else if (!imConvert) {
-        throw new Error('ImageMagick executable not found: `convert`');
-    } else if (!imIdentify) {
-        throw new Error('ImageMagick executable not found: `identify`');
     }
 
     return config;
