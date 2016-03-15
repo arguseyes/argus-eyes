@@ -41,7 +41,7 @@ if (action === 'start') {
     if (fileExists(pidfile)) {
         console.log('PID file already found at: ' + path.relative(process.cwd(), pidfile));
         console.log('Server already running?');
-        process.exit(1);
+        return;
     }
 
     var proc = child_process.spawn('node', [__dirname + '/server.js'], { detached: true });
@@ -53,14 +53,14 @@ if (action === 'start') {
 }
 
 /**
- * Start server
+ * Stop server
  */
 if (action === 'stop') {
 
     if (!fileExists(pidfile)) {
         console.log('PID file not found at: ' + path.relative(process.cwd(), pidfile));
         console.log('Server not running?');
-        process.exit(1);
+        return;
     }
 
     var pid = fs.readFileSync(pidfile, { encoding: 'utf8' });
