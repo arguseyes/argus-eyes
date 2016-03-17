@@ -8,28 +8,20 @@ var system = require('system');
 var page   = require('webpage').create();
 
 // Configuration
-var currentTries = 0;
-var maxTries     = 50;
-var tryTimeout   = 100;
+var maxTries   = 50;
+var tryTimeout = 100;
+var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
 var url        = system.args[1];
 var file       = system.args[2];
 var size       = system.args[3].split('x');
-var sel        = system.args[4];
-var ignore     = JSON.parse(system.args[5]);
-var userScript = system.args[6];
+var components = JSON.parse(system.args[4]);
+var userScript = system.args[5];
 
 page.viewportSize = {
     width: size[0],
     height: size[1]
-};
-
-page.onConsoleMessage = function(msg, lineNum, sourceId) {
-    if (lineNum && sourceId) {
-        msg += ' (from line #' + lineNum + ' in "' + sourceId + '")';
-    }
-    console.log('Console: ' + msg);
 };
 
 page.open(url, function(status) {
@@ -39,7 +31,7 @@ page.open(url, function(status) {
         return phantom.exit(1);
     }
 
-    // Initalize PhantonJS script
+    // Initalize PhantomJS script
     waitForLoad();
 
     /**
@@ -48,21 +40,20 @@ page.open(url, function(status) {
      */
     function waitForLoad() {
 
-        currentTries++;
+        var isLoaded = function() {
+            var readyState = page.evaluate(function() {
+                return document.readyState;
+            });
+            return readyState === 'complete';
+        };
 
-        var readyState = page.evaluate(function() {
-            return document.readyState;
-        });
-
-        if (readyState === 'complete') {
-            currentTries = 0;
+        invoker(isLoaded, function(err) {
+            if (err) {
+                console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout / 1e3) + 'ms.');
+                return phantom.exit(1);
+            }
             waitForUserScript();
-        } else if (currentTries < maxTries) {
-            setTimeout(waitForLoad, tryTimeout);
-        } else {
-            console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout / 1e3) + 'ms.');
-            phantom.exit(1);
-        }
+        });
     }
 
     /**
@@ -71,21 +62,19 @@ page.open(url, function(status) {
      */
     function waitForUserScript() {
 
-        currentTries++;
+        var isFinished = function() {
+            return page.evaluate(function(userScript) {
+                return (Function(userScript))();
+            }, userScript);
+        };
 
-        var userScriptFinished = page.evaluate(function(userScript) {
-            return (Function(userScript))();
-        }, userScript);
-
-        if (userScriptFinished) {
-            currentTries = 0;
+        invoker(isFinished, function(err) {
+            if (err) {
+                console.log('finished-when userscript still not completed, timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                return phantom.exit(1);
+            }
             tryRemoveIgnores();
-        } else if (currentTries < maxTries) {
-            setTimeout(waitForUserScript, tryTimeout);
-        } else {
-            console.log('finished-when userscript still not completed, timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-            phantom.exit(1);
-        }
+        });
     }
 
     /**
@@ -94,33 +83,41 @@ page.open(url, function(status) {
      */
     function tryRemoveIgnores() {
 
-        if (!ignore.length) {
-            return tryClipRect();
-        }
-
-        currentTries++;
-
-        var removed = page.evaluate(function(baseSelector, ignore) {
-            try {
-                ignore.forEach(function(selector) {
-                    var element = document.querySelector(baseSelector + ' ' + selector);
-                    element.style.display = 'none';
-                });
-                return true;
-            } catch (e) {
-                return false;
+        var count = components.length;
+        var done = function() {
+            if (--count === 0) {
+                done = function() {};
+                tryClipRect();
             }
-        }, sel, ignore);
+        };
 
-        if (removed) {
-            currentTries = 0;
-            tryClipRect();
-        } else if (currentTries < maxTries) {
-            setTimeout(tryRemoveIgnores, tryTimeout);
-        } else {
-            console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-            phantom.exit(1);
-        }
+        components.forEach(function(component) {
+
+            if (!component.ignore || !component.ignore.length) return done();
+
+            var isRemoved = function() {
+                return page.evaluate(function(baseSelector, ignore) {
+                    try {
+                        ignore.forEach(function(selector) {
+                            var element = document.querySelector(baseSelector + ' ' + selector);
+                            element.style.display = 'none';
+                        });
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                }, component.selector, component.ignore);
+            };
+
+            invoker(isRemoved, function(err) {
+                if (err) {
+                    console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                    return phantom.exit(1);
+                }
+                done();
+            });
+
+        });
     }
 
     /**
@@ -129,37 +126,41 @@ page.open(url, function(status) {
      */
     function tryClipRect() {
 
-        currentTries++;
-
-        var clipRect = page.evaluate(function(sel) {
-            try {
-                var element = document.querySelector(sel);
-                return element.getBoundingClientRect();
-            } catch (e) {
-                return false;
-            }
-        }, sel);
-
-        if (clipRect) {
-            if (clipRect.width > 0 && clipRect.height > 0) {
-                page.clipRect = {
-                    top:    clipRect.top,
-                    left:   clipRect.left,
-                    width:  clipRect.width,
-                    height: clipRect.height
-                };
-                currentTries = 0;
+        var count = components.length;
+        var done = function() {
+            if (--count === 0) {
                 tryScreenshot();
-            } else {
-                console.log('Element hidden: \'' + sel + '\', skipping screenshot.');
-                phantom.exit();
             }
-        } else if (currentTries < maxTries) {
-            return setTimeout(tryClipRect, tryTimeout);
-        } else {
-            console.log('Unable to clip element \'' + sel + '\' at address: ' + url + ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-            phantom.exit(1);
-        }
+        };
+
+        components.forEach(function(component, index) {
+
+            var getRect = function() {
+                return page.evaluate(function(sel) {
+                    try {
+                        return document.querySelector(sel).getBoundingClientRect();
+                    } catch (e) {
+                        return false;
+                    }
+                }, component.selector);
+            };
+
+            invoker(getRect, function(err, rect) {
+                if (err) {
+                    console.log('Unable to clip element \'' + component.selector +
+                        '\' at address: ' + url +
+                        ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                    return phantom.exit(1);
+                } else if (rect.width <= 0 || rect.height <= 0) {
+                    console.log('Unable to clip element \'' + component.selector +
+                        '\' at address: ' + url +
+                        ', width and height both must be bigger than 0.');
+                    return phantom.exit(1);
+                }
+                components[index].clip = rect;
+                done();
+            });
+        });
     }
 
     /**
@@ -168,16 +169,54 @@ page.open(url, function(status) {
      */
     function tryScreenshot() {
 
-        currentTries++;
+        var tookScreenshot = function() {
+            return page.render(file, { format: 'png', quality: '0' }); // 'png quality' is compression, since it's lossless
+        };
 
-        if (page.render(file, { format: 'png', quality: '100' })) {
-            phantom.exit();
-        } else if (currentTries < maxTries) {
-            setTimeout(tryScreenshot, tryTimeout);
-        } else {
-            console.log('Unable to write file: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-            phantom.exit(1);
-        }
+        invoker(tookScreenshot, function(err) {
+            if (err) {
+                console.log('Unable to write file: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                return phantom.exit(1);
+            }
+            outputJSON();
+        });
+    }
+
+    /**
+     * Output components in JSON format
+     */
+    function outputJSON() {
+        console.log(JSON.stringify(components));
+        phantom.exit();
     }
 
 });
+
+/**
+ * Invoker
+ *  Repeatedly invokes a function until it returns a truthy value
+ *
+ * @see https://gist.github.com/branneman/53b820be519b54bfc30a
+ * @param {Number} limit - The amount of total calls before we timeout
+ * @param {Number} interval - The amount of milliseconds between calls
+ * @param {Function} fn - The function to execute, must return a truthy value to indicate it's finished
+ * @param {Function} cb - The callback for when we're finished. Recieves 2 arguments: `error` and `result`
+ */
+function _invoker(limit, interval) {
+    return function(fn, cb) {
+        var current = 0;
+        var _fn = function() {
+            current++;
+            var result = fn();
+            if (result) {
+                cb(null, result);
+            } else if (current < limit) {
+                setTimeout(_fn, interval);
+            } else {
+                cb(new Error('Limit exceeded!'), null);
+                cb = function() {};
+            }
+        };
+        _fn();
+    };
+}

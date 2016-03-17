@@ -24,8 +24,9 @@ describe('Action: Capture', function() {
             '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json')
         ], { encoding: 'utf8' });
 
-        // Assert correct exitcode
+        // Assert correct exitcode and output
         assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
 
         // Assert size directories
         var numDirs1 = glob(normalize(__dirname + '/../../.argus-eyes/test') + '/*').length;
@@ -65,7 +66,10 @@ describe('Action: Capture', function() {
         ], { encoding: 'utf8' });
 
         assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
         assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
 
     });
 
@@ -89,6 +93,8 @@ describe('Action: Capture', function() {
         ], { encoding: 'utf8' });
 
         assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
         assert.equal(procCompare.status, 1, procCompare.stdout);
         assert.equal(/Found 1 difference/.test(procCompare.stdout), true, procCompare.stdout);
 
@@ -114,7 +120,37 @@ describe('Action: Capture', function() {
         ], { encoding: 'utf8' });
 
         assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
         assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
+
+    });
+
+    it('should handle ignored elements', function() {
+
+        var procCapture = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'capture',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/ignored-element/ignored-element.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/ignored-element')
+        ], { encoding: 'utf8' });
+
+        var procCompare = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/ignored-element/ignored-element.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/ignored-element')
+        ], { encoding: 'utf8' });
+
+        assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
+        assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
 
     });
 
@@ -128,6 +164,7 @@ describe('Action: Capture', function() {
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
         assert.equal(glob('.argus-eyes/*')[0], '.argus-eyes/test1-test2', 'Correct directory not found!');
 
     });
@@ -142,9 +179,10 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../../.argus-eyes-custom-dir')
         ], { encoding: 'utf8' });
 
-        var numDirs = glob(normalize(__dirname + '/../../.argus-eyes-custom-dir') + '/*').length;
-
         assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
+
+        var numDirs = glob(normalize(__dirname + '/../../.argus-eyes-custom-dir') + '/*').length;
         assert.equal(numDirs, 1);
 
     });
