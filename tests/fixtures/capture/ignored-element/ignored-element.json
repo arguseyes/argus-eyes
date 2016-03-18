@@ -3,7 +3,7 @@
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:8080/index-ignored-element.html",
+      "url": "http://localhost:6530/index-ignored-element.html",
       "components": ["header", "footer"]
     }
   ],

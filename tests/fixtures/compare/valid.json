@@ -3,12 +3,12 @@
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:8080/",
+      "url": "http://localhost:6530/",
       "components": ["header", "footer"]
     },
     {
       "name": "contact",
-      "url": "http://localhost:8080/contact.html",
+      "url": "http://localhost:6530/contact.html",
       "components": ["header", "footer"]
     }
   ],

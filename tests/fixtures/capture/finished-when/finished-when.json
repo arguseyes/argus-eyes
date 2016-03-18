@@ -4,7 +4,7 @@
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:8080/index-finished-when.html",
+      "url": "http://localhost:6530/index-finished-when.html",
       "components": ["header", "footer"]
     }
   ],
