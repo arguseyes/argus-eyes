@@ -1,6 +1,6 @@
 {
   "name": "argus-eyes",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A lightweight commandline tool for visual regression testing of UI components.",
   "main": "bin/argus-eyes.js",
   "bin": {
