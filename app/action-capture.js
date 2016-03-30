@@ -71,13 +71,15 @@ module.exports = function capture(id) {
             }
 
             // Crop components
-            if (proc.status === 0 && !proc.error && !proc.stderr && proc.stdout) {
+            if (proc.status === 0 && !proc.error && proc.stdout) {
 
                 try {
                     var components = JSON.parse(proc.stdout);
                 } catch (e) {
                     return log.warning(util.format("PhantomJS errored for page: '%s'", page.name));
                 }
+
+                if (proc.stderr) log.warning(util.prefixStdStream(' PhantomJS stderr', proc.stderr));
 
                 components.forEach(component => {
 
