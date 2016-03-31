@@ -6,7 +6,6 @@ var child_process  = require('child_process');
 var fs             = require('fs');
 var path           = require('path');
 var phantomjsPath  = require('phantomjs-prebuilt').path;
-var PNGImage       = require('pngjs-image');
 var rimraf         = require('rimraf').sync;
 
 /**
@@ -42,7 +41,6 @@ module.exports = function capture(id) {
         userConfig.pages.forEach(page => {
 
             var pageBase = baseDir + '/' + size + '/' + page.name;
-            var pageFile = pageBase + '.png';
             util.mkdir(pageBase);
 
             log.verbose(util.format("Taking screenshots with PhantomJS for page: '%s'",
@@ -55,56 +53,40 @@ module.exports = function capture(id) {
             var args = [
                 __dirname + '/phantomjs-script.js',
                 page.url,
-                pageFile,
+                pageBase,
                 size,
                 componentsJSON,
                 (userConfig['finished-when'] || 'return true')
             ];
             var proc = child_process.spawnSync(phantomjsPath, args, { encoding: 'utf8' });
 
-            // Load page image into memory and remove it
-            try {
-                var pageImgData = fs.readFileSync(pageFile);
-                fs.unlinkSync(pageFile);
-            } catch (e) {
-                return log.warning(util.format("PhantomJS could not take screenshots for page: '%s'", page.name));
-            }
+            // Check exit status
+            if (proc.status === 0 && !proc.error) {
 
-            // Crop components
-            if (proc.status === 0 && !proc.error && proc.stdout) {
+                if (proc.stderr) log.verbose(util.prefixStdStream(' PhantomJS stderr', proc.stderr));
+                if (proc.stdout) log.warning(util.prefixStdStream(' PhantomJS stdout', proc.stdout));
 
-                try {
-                    var components = JSON.parse(proc.stdout);
-                } catch (e) {
-                    return log.warning(util.format("PhantomJS errored for page: '%s'", page.name));
-                }
-
-                if (proc.stderr) log.warning(util.prefixStdStream(' PhantomJS stderr', proc.stderr));
-
-                components.forEach(component => {
-
-                    var componentFile = pageBase + '/' + component.name + '.png';
-                    util.mkdir(pageBase);
-
-                    // Crop and save component image
-                    var componentImg = PNGImage.loadImageSync(pageImgData);
-                    var clip = component.clip;
-                    componentImg.clip(clip.left, clip.top, clip.width, clip.height);
-                    componentImg.writeImageSync(componentFile);
-
-                    return shots++;
+                // Check existance of all .png files
+                page.components.forEach(componentId => {
+                    if (!util.fileExists(pageBase + '/' + componentId + '.png')) {
+                        success = false;
+                        log.error(util.format("PhantomJS errored for page '%s' and component '%s'",
+                            page.name,
+                            componentId));
+                    }
                 });
+                if (!success) return;
 
-                return;
+                return shots += page.components.length;
             }
 
             // Report errors if we're still here
             success = false;
-            log.error(util.format("PhantomJS errored for file: '%s'", path.relative(process.cwd(), pageFile)));
+            log.error(util.format("PhantomJS errored for page: '%s'", page.name));
 
             if (proc.error)  log.verbose(' ' + JSON.stringify(proc.error));
-            if (proc.stderr) log.warning(util.prefixStdStream(' stderr', proc.stderr));
-            if (proc.stdout) log.warning(util.prefixStdStream(' stdout', proc.stdout));
+            if (proc.stderr) log.warning(util.prefixStdStream(' PhantomJS stderr', proc.stderr));
+            if (proc.stdout) log.warning(util.prefixStdStream(' PhantomJS stdout', proc.stdout));
         });
     });
 

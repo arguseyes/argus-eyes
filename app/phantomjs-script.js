@@ -14,7 +14,7 @@ var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
 var url        = system.args[1];
-var file       = system.args[2];
+var pageBase   = system.args[2];
 var size       = system.args[3].split('x');
 var components = JSON.parse(system.args[4]);
 var userScript = system.args[5];
@@ -22,6 +22,10 @@ var userScript = system.args[5];
 page.viewportSize = {
     width: size[0],
     height: size[1]
+};
+
+page.onConsoleMessage = function(msg) {
+    console.log('console: ' + msg);
 };
 
 page.open(url, function(status) {
@@ -111,7 +115,7 @@ page.open(url, function(status) {
 
             invoker(isRemoved, function(err) {
                 if (err) {
-                    console.log('Unable to remove DOM element: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                    console.log('Unable to remove DOM element: \'' + component.selector + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
                     return phantom.exit(1);
                 }
                 done();
@@ -121,73 +125,59 @@ page.open(url, function(status) {
     }
 
     /**
-     * Define the area of the web page to be rasterized when `page.render` is invoked
+     * Clip element and save as .png file
      *  Repeatedly invoked until it succeeds or maxTries is reached.
      */
     function tryClipRect() {
 
         var count = components.length;
         var done = function() {
-            if (--count === 0) {
-                tryScreenshot();
-            }
+            if (--count === 0) phantom.exit();
         };
 
-        components.forEach(function(component, index) {
+        components.forEach(function(component) {
 
-            var getRect = function() {
-                return page.evaluate(function(sel) {
+            var clipRect = function() {
+
+                var clipRect = page.evaluate(function(component) {
                     try {
-                        return document.querySelector(sel).getBoundingClientRect();
+                        var rect = document.querySelector(component.selector).getBoundingClientRect();
+                        return {
+                            top: rect.top,
+                            left: rect.left,
+                            width: rect.width,
+                            height: rect.height
+                        };
                     } catch (e) {
                         return false;
                     }
-                }, component.selector);
+                }, component);
+
+                if (!clipRect) return;
+                page.clipRect = clipRect;
+
+                try {
+                    page.render(pageBase + '/' + component.name + '.png', {
+                        format: 'png',
+                        quality: '0' // quality is file compression since png is lossless
+                    });
+                } catch (e) {
+                    return false;
+                }
+
+                return true;
             };
 
-            invoker(getRect, function(err, rect) {
+            invoker(clipRect, function(err) {
                 if (err) {
-                    console.log('Unable to clip element \'' + component.selector +
+                    console.log('Unable to clip component \'' + component.name +
                         '\' at address: ' + url +
                         ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
                     return phantom.exit(1);
-                } else if (rect.width <= 0 || rect.height <= 0) {
-                    console.log('Unable to clip element \'' + component.selector +
-                        '\' at address: ' + url +
-                        ', width and height both must be bigger than 0.');
-                    return phantom.exit(1);
                 }
-                components[index].clip = rect;
                 done();
             });
         });
-    }
-
-    /**
-     * Save clipped element as .png file
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function tryScreenshot() {
-
-        var tookScreenshot = function() {
-            return page.render(file, { format: 'png', quality: '0' }); // 'png quality' is compression, since it's lossless
-        };
-
-        invoker(tookScreenshot, function(err) {
-            if (err) {
-                console.log('Unable to write file: \'' + file + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-                return phantom.exit(1);
-            }
-            outputJSON();
-        });
-    }
-
-    /**
-     * Output components in JSON format
-     */
-    function outputJSON() {
-        console.log(JSON.stringify(components));
-        phantom.exit();
     }
 
 });
@@ -200,7 +190,7 @@ page.open(url, function(status) {
  * @param {Number} limit - The amount of total calls before we timeout
  * @param {Number} interval - The amount of milliseconds between calls
  * @param {Function} fn - The function to execute, must return a truthy value to indicate it's finished
- * @param {Function} cb - The callback for when we're finished. Recieves 2 arguments: `error` and `result`
+ * @param {Function} cb - The callback for when we're finished. Receives 2 arguments: `error` and `result`
  */
 function _invoker(limit, interval) {
     return function(fn, cb) {
