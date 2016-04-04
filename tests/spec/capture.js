@@ -25,7 +25,7 @@ describe('Action: Capture', function() {
         ], { encoding: 'utf8' });
 
         // Assert correct exitcode and output
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
 
         // Assert size directories
@@ -65,10 +65,10 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../fixtures/capture/known-positives')
         ], { encoding: 'utf8' });
 
-        assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
 
-        assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
 
     });
@@ -92,10 +92,10 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../fixtures/capture/known-negatives')
         ], { encoding: 'utf8' });
 
-        assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
 
-        assert.equal(procCompare.status, 1, procCompare.stdout);
+        assert.equal(procCompare.status, 1, 'Exitcode not 1!');
         assert.equal(/Found 1 difference/.test(procCompare.stdout), true, procCompare.stdout);
 
     });
@@ -119,10 +119,10 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
         ], { encoding: 'utf8' });
 
-        assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
 
-        assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
 
     });
@@ -146,10 +146,10 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../fixtures/capture/ignored-element')
         ], { encoding: 'utf8' });
 
-        assert.equal(procCapture.status, 0, procCapture.stdout);
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
 
-        assert.equal(procCompare.status, 0, procCompare.stdout);
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
 
     });
@@ -163,7 +163,7 @@ describe('Action: Capture', function() {
             '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
         assert.equal(glob('.argus-eyes/*')[0], '.argus-eyes/test1-test2', 'Correct directory not found!');
 
@@ -179,7 +179,7 @@ describe('Action: Capture', function() {
             '--base=' + normalize(__dirname + '/../../.argus-eyes-custom-dir')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
 
         var numDirs = glob(normalize(__dirname + '/../../.argus-eyes-custom-dir') + '/*').length;

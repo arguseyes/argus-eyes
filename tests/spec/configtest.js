@@ -14,7 +14,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/file not found/.test(proc.stdout), true, proc.stdout);
 
     });
@@ -29,7 +29,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Incorrect JSON/.test(proc.stdout), true, proc.stdout);
 
     });
@@ -44,7 +44,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/Config valid/.test(proc.stdout), true, proc.stdout);
 
     });
@@ -59,7 +59,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/sizes/.test(proc.stdout), true, proc.stdout);
 
@@ -75,7 +75,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/sizes/.test(proc.stdout), true, proc.stdout);
 
@@ -91,7 +91,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/pages/.test(proc.stdout), true, proc.stdout);
 
@@ -107,7 +107,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/pages/.test(proc.stdout), true, proc.stdout);
 
@@ -123,7 +123,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/components/.test(proc.stdout), true, proc.stdout);
 
@@ -139,9 +139,25 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/components/.test(proc.stdout), true, proc.stdout);
+
+    });
+
+    it('should fail with incorrect concurrency', function() {
+
+        var args = [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'configtest',
+            '--config=tests/fixtures/configtest/invalid-concurrency.json'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
+        assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
+        assert.equal(/concurrency/.test(proc.stdout), true, proc.stdout);
 
     });
 
@@ -155,7 +171,7 @@ describe('Action: Configtest', function() {
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
         assert.equal(/finished-when/.test(proc.stdout), true, proc.stdout);
 

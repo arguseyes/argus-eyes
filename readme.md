@@ -199,9 +199,17 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
     }
     // ...
   ],
+  concurrency: Number,   // [Optional] Number of concurrent PhantomJS instances
   finished-when: String  // [Optional] Valid JavaScript return statement
 }
 ```
+
+#### Concurrency
+
+Concurrency must be a number between 1 and 100, it defaults to 10 if not provided. One PhantomJS instance is used per
+page, not per component, screenshots of components are captured synchronously.
+
+#### Finished when
 
 If provided, the `finished-when` string must contain a return statement that evaluates to `true` whenever the page is
 ready to be captured, `false` if it's not yet. If omitted, it defaults to `return true`. Internally, this string is

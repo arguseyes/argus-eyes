@@ -11,7 +11,7 @@ describe('Action: Help', function() {
             '--help'
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/Usage:[\s\S]+Options:/.test(proc.stdout), true, proc.stdout);
 
     });
@@ -24,7 +24,7 @@ describe('Action: Help', function() {
             '--config=file-does-not-exist.json'
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/Usage:[\s\S]+Options:/.test(proc.stdout), true, proc.stdout);
 
     });

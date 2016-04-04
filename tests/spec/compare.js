@@ -24,7 +24,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
 
     });
@@ -40,7 +40,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
 
     });
@@ -58,7 +58,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-effectively')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
         assert.equal(/not bigger than threshold/.test(proc.stdout), true, "string not found: 'not bigger than threshold'");
 
@@ -76,7 +76,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + dir)
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
 
         var diff = glob(normalize(__dirname + dir + '/diff_baseline_current/768x1024/homepage/footer.png')).length;
@@ -98,7 +98,7 @@ describe('Action: Compare', function() {
             '--verbose'
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
 
         var diff = glob(normalize(__dirname + dir + '/diff_baseline_current/768x1024/homepage/footer.png')).length;
@@ -118,7 +118,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-different-sizes')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
         assert.equal(/dimensions differ/.test(proc.stdout), true, "string not found: 'dimensions differ'");
 
@@ -137,7 +137,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + dir)
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 1, proc.stdout);
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Found 1 difference/.test(proc.stdout), true, "string not found: 'Found 1 difference'");
         assert.equal(/dimensions differ/.test(proc.stdout), true, "string not found: 'dimensions differ'");
 
@@ -157,7 +157,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-missing-left')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
         assert.equal(/not found in left side/.test(proc.stdout), true, "string not found: 'not found in left side'");
 
@@ -174,7 +174,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-missing-right')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
         assert.equal(/not found in right side/.test(proc.stdout), true, "string not found: 'not found in left side'");
 
@@ -191,7 +191,7 @@ describe('Action: Compare', function() {
             '--base=' + normalize(__dirname + '/../fixtures/compare/known-positives-slashes')
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/no significant differences/.test(proc.stdout), true, "string not found: 'no significant differences'");
 
     });

@@ -11,7 +11,7 @@ describe('Action: Version', function() {
             '--version'
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/v\d+\.\d+\.\d+/.test(proc.stdout), true, proc.stdout);
 
     });
@@ -24,7 +24,7 @@ describe('Action: Version', function() {
             '--config=file-does-not-exist.json'
         ], { encoding: 'utf8' });
 
-        assert.equal(proc.status, 0, proc.stdout);
+        assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/v\d+\.\d+\.\d+/.test(proc.stdout), true, proc.stdout);
 
     });

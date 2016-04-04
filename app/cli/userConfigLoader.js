@@ -61,6 +61,16 @@ function validateUserConfig(userConfig) {
         }
     });
 
+    // Validate concurrency
+    if (typeof userConfig['concurrency'] !== 'undefined') {
+        if (typeof userConfig['concurrency'] !== 'number') {
+            throw new Error('Config: concurrency must be a number!');
+        }
+        if (userConfig['concurrency'] < 1 || userConfig['concurrency'] > 100) {
+            throw new Error('Config: concurrency must be a number between 1 and 100!');
+        }
+    }
+
     // Validate finished-when
     if (typeof userConfig['finished-when'] !== 'undefined' && typeof userConfig['finished-when'] !== 'string') {
         throw new Error('Config: finished-when must be a valid JavaScript string!');

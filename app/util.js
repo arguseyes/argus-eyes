@@ -10,6 +10,7 @@ var mkdirp        = require('mkdirp').sync;
 module.exports = {
     escape,
     fileExists,
+    fileExistsAsync,
     directoryExists,
     isExecutable,
     mkdir,
@@ -41,6 +42,19 @@ function fileExists(file) {
     } catch (e) {
         return false;
     }
+}
+
+/**
+ * Async fileExists()
+ *
+ * @param {String} file
+ * @param {Function} cb
+ */
+function fileExistsAsync(file, cb) {
+    fs.stat(file, (err, stats) => {
+        if (err) return cb(err);
+        return cb(null, stats.isFile());
+    });
 }
 
 /**

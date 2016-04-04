@@ -27,11 +27,11 @@ switch (action[0]) {
     case 'capture':
         try {
             userCfgLoader.getUserConfig();
-            process.exit(actionCapture(action[1]) ? 0 : 1);
+            actionCapture(action[1], success => process.exit(success ? 0 : 1));
         } catch (e) {
             log.error('Error: ' + e.message);
+            process.exit(1);
         }
-        process.exit(1);
         break;
 
     case 'compare':
