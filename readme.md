@@ -307,7 +307,7 @@ $ argus-eyes --version
 ## Contributing
 
 Want to contribute to argus-eyes? Awesome! You can contribute in multiple ways. Found a bug? Thought of a new feature?
-Check the [contributing guidelines](CONTRIBUTING.md) and find out how to contribute.
+Check the [contributing guidelines](contributing.md) and find out how to contribute.
 
 
 ## License

@@ -25,6 +25,7 @@ though :)
 5. Push to your fork
 6. Submit pull request
 
-## GitHub's documentation on Contributing
+## Read more
 
 - [Contributing on GitHub](https://guides.github.com/activities/contributing-to-open-source/)
+- [Using pull requests](https://help.github.com/articles/using-pull-requests/)
