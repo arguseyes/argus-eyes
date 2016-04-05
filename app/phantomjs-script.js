@@ -53,7 +53,7 @@ page.open(url, function(status) {
 
         invoker(isLoaded, function(err) {
             if (err) {
-                console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout / 1e3) + 'ms.');
+                console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout) + 'ms.');
                 return phantom.exit(1);
             }
             waitForUserScript();
@@ -74,7 +74,8 @@ page.open(url, function(status) {
 
         invoker(isFinished, function(err) {
             if (err) {
-                console.log('finished-when userscript still not completed, timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                console.log('finished-when userscript still not completed, timed out after ' +
+                    (maxTries * tryTimeout) + ' ms.');
                 return phantom.exit(1);
             }
             tryRemoveIgnores();
@@ -115,7 +116,8 @@ page.open(url, function(status) {
 
             invoker(isRemoved, function(err) {
                 if (err) {
-                    console.log('Unable to remove DOM element: \'' + component.selector + '\', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                    console.log('Unable to remove DOM element: \'' + component.selector + '\'' +
+                        ', timed out after ' + (maxTries * tryTimeout) + ' ms.');
                     return phantom.exit(1);
                 }
                 done();
@@ -170,8 +172,7 @@ page.open(url, function(status) {
 
             invoker(clipRect, function(err) {
                 if (err) {
-                    console.log('Unable to clip component \'' + component.name +
-                        '\' at address: ' + url +
+                    console.log('Unable to clip component \'' + component.name + '\'' +
                         ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
                     return phantom.exit(1);
                 }

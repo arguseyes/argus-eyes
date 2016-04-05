@@ -289,7 +289,7 @@ $ argus-eyes capture develop --base==visual-regression
 
 #### Verbose
 
-Turn on verbose output.
+Turn on verbose output. All output is prefixed with a date string in simplified ISO 8601 format.
 
 ```bash
 $ argus-eyes compare develop feature/navigation --verbose

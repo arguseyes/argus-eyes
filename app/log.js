@@ -1,4 +1,5 @@
 var chalk = require('chalk');
+var util  = require('./util');
 
 /**
  * @type {Boolean}
@@ -94,5 +95,8 @@ function error(msg) {
  * @param {String} coloredMessage
  */
 function _log(coloredMessage) {
+    if (_verbose) {
+        coloredMessage = chalk.gray('[' + util.getFormattedDatetime() + '] ') + coloredMessage;
+    }
     console.log(_useColor ? coloredMessage : chalk.stripColor(coloredMessage));
 }

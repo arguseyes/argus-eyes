@@ -69,7 +69,7 @@ module.exports = function compare(id1, id2) {
             var result = diff.runSync();
         } catch (e) {
             log.warning(util.format("Image comparison returned an error for file: '%s'", filename));
-            log.warning(util.prefixStdStream(' blinkdiff', JSON.stringify(e)));
+            log.warning(util.prefixStdStream(' BlinkDiff: ', JSON.stringify(e)));
             return;
         }
 

@@ -58,6 +58,10 @@ module.exports = function capture(id, cb) {
             path.relative(process.cwd(), config.base),
             id));
 
+        if (failed > 0) {
+            log.warning(util.format('Failed to take %d sceenshot%s', failed, util.plural(failed)));
+        }
+
         cb(failed === 0);
     };
 };
@@ -86,10 +90,14 @@ function createWorker(userConfig, baseDir) {
  */
 function queueWorker(userConfig, baseDir, task, cb) {
 
+    var prefixSize = str => util.prefixStdStream('[' + task.size + '] ', str);
+    var prefixPage = str => util.prefixStdStream('[page: ' + task.page.name + '] ', str);
+    var logPrefix  = str => prefixPage(prefixSize(str));
+
     var pageBase = baseDir + '/' + task.size + '/' + task.page.name;
     util.mkdir(pageBase);
 
-    log.verbose(util.format("Taking screenshots with PhantomJS for page: '%s' size: %s", task.page.name, task.size));
+    log.verbose(logPrefix(util.format('Starting PhantomJS')));
 
     var componentsJSON = JSON.stringify(task.page.components.map(componentId =>
         userConfig.components.find(component => component.name === componentId)));
@@ -112,8 +120,8 @@ function queueWorker(userConfig, baseDir, task, cb) {
 
     // Report on error
     proc.on('error', err => {
-        log.error(util.format("Failed to start PhantomJS for page: '%s'", task.page.name));
-        log.verbose(' ' + JSON.stringify(err));
+        log.error(logPrefix('Failed to start PhantomJS'));
+        log.verbose(logPrefix(util.prefixStdStream(' ', JSON.stringify(err))));
         cb(null, { shots: 0, failed: task.page.components.length });
         cb = () => {};
     });
@@ -124,8 +132,8 @@ function queueWorker(userConfig, baseDir, task, cb) {
         // Check exit status
         if (code === 0) {
 
-            if (stderr) log.verbose(util.prefixStdStream(' PhantomJS stderr', stderr));
-            if (stdout) log.warning(util.prefixStdStream(' PhantomJS stdout', stdout));
+            if (stderr) log.verbose(logPrefix(util.prefixStdStream(' PhantomJS stderr: ', stderr)));
+            if (stdout) log.warning(logPrefix(util.prefixStdStream(' PhantomJS stdout: ', stdout)));
 
             var shots = 0, failed = 0;
 
@@ -138,9 +146,7 @@ function queueWorker(userConfig, baseDir, task, cb) {
                             shots++;
                         } else {
                             failed++;
-                            log.error(util.format("PhantomJS errored for page '%s' and component '%s'",
-                                task.page.name,
-                                componentId));
+                            log.error(logPrefix(util.format( "PhantomJS errored for component '%s'", componentId)));
                         }
                         cb();
                     });
@@ -148,7 +154,8 @@ function queueWorker(userConfig, baseDir, task, cb) {
             });
 
             async.parallel(tasks, () => {
-                cb(null, {shots, failed});
+                log.verbose(logPrefix(util.format('PhantomJS captured %d components', shots)));
+                cb(null, { shots, failed });
                 cb = () => {};
             });
 
@@ -159,8 +166,8 @@ function queueWorker(userConfig, baseDir, task, cb) {
         // Report errors if we're still here
         log.error(util.format("PhantomJS errored for page: '%s'", task.page.name));
 
-        if (stderr) log.warning(util.prefixStdStream(' PhantomJS stderr', stderr));
-        if (stdout) log.warning(util.prefixStdStream(' PhantomJS stdout', stdout));
+        if (stderr) log.warning(logPrefix(util.prefixStdStream(' PhantomJS stderr: ', stderr)));
+        if (stdout) log.warning(logPrefix(util.prefixStdStream(' PhantomJS stdout: ', stdout)));
 
         cb(null, { shots: 0, failed: task.page.components.length });
         cb = () => {};

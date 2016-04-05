@@ -15,9 +15,10 @@ module.exports = {
     isExecutable,
     mkdir,
     removeEmptyDirectories,
-    format: util.format,
+    format,
     prefixStdStream,
-    plural
+    plural,
+    getFormattedDatetime
 };
 
 /**
@@ -124,6 +125,15 @@ function removeEmptyDirectories(path) {
 }
 
 /**
+ * Node.js' util.format()
+ *
+ * @returns {String}
+ */
+function format() {
+    return util.format.apply(util, arguments);
+}
+
+/**
  * Prefix standard stream output
  *
  * @param {String} stream - Stream name, such as 'stdout'
@@ -134,7 +144,7 @@ function prefixStdStream(stream, str) {
     return str
         .trim()
         .split('\n')
-        .map(line => stream + ': ' + line)
+        .map(line => stream + line)
         .join('\n');
 }
 
@@ -146,4 +156,14 @@ function prefixStdStream(stream, str) {
  */
 function plural(num) {
     return num === 1 ? '' : 's';
+}
+
+/**
+ * Returns the current timestamp
+ *  Formatted as simplified ISO 8601 string, timezone always zero UTC
+ *
+ * @returns {String}
+ */
+function getFormattedDatetime() {
+    return (new Date).toISOString();
 }
