@@ -23,7 +23,8 @@ var _defaultConfig = {
     base: process.cwd() + '/.argus-eyes',
     verbose: false,
     color: true,
-    threshold: 0
+    threshold: 0,
+    concurrency: 10
 };
 
 /**
@@ -78,7 +79,8 @@ function getAction() {
  *   base: String,
  *   verbose: Boolean,
  *   color: Boolean,
- *   threshold: Number
+ *   threshold: Number,
+ *   concurrency: Number
  * }} Config
  * @throws {Error}
  * @returns {Config} - The final config
@@ -120,6 +122,16 @@ function getConfig() {
         config.threshold = parseFloat(argv.threshold);
         if (config.threshold < 0 || config.threshold > 100 || Number.isNaN(config.threshold)) {
             throw new Error('Incorrect threshold given');
+        }
+    }
+
+    if (typeof argv.concurrency !== 'undefined') {
+        if (typeof argv.concurrency !== 'number') {
+            throw new Error('Incorrect concurrency given');
+        }
+        config.concurrency = parseInt(argv.concurrency);
+        if (config.concurrency < 1 || config.concurrency > 100) {
+            throw new Error('Concurrency must be a number between 1 and 100');
         }
     }
 

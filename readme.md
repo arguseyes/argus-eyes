@@ -204,11 +204,6 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
 }
 ```
 
-#### Concurrency
-
-Concurrency must be a number between 1 and 100, it defaults to 10 if not provided. One PhantomJS instance is used per
-page, not per component, screenshots of components are captured synchronously.
-
 #### Finished when
 
 If provided, the `finished-when` string must contain a return statement that evaluates to `true` whenever the page is
@@ -266,6 +261,20 @@ increasing the threshold, since that will also increase the chance of unintended
 
 ```bash
 $ argus-eyes compare develop feature/navigation --threshold=10
+```
+
+#### Concurrency
+
+_Default:_ 10
+
+Set the number of PhantomJS instances to run in parallel. This must be a number between 1 and 100. A single PhantomJS
+instance is used for every page, not for every component. Screenshots of components are captured synchronously.
+
+**Be advised**: At this moment only the [Capture](#capture) uses this option, since PhantomJS is the biggest performance
+hit. The [Compare](#compare) action might be using this in the future as well.
+
+```bash
+$ argus-eyes capture feature/navigation --concurrency=25
 ```
 
 #### Base

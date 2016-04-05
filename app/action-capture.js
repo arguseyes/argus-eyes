@@ -28,9 +28,7 @@ module.exports = function capture(id, cb) {
         rimraf(baseDir);
     }
 
-    var concurrency = userConfig.concurrency || 10;
-    log.verbose(util.format('Using a PhantomJS concurrency of %s', concurrency));
-
+    log.verbose(util.format('Using a PhantomJS concurrency of %s', config.concurrency));
     log.verbose(util.format('Found %d size%s, %d page%s and %d component%s',
         userConfig.sizes.length,
         util.plural(userConfig.sizes.length),
@@ -39,7 +37,7 @@ module.exports = function capture(id, cb) {
         userConfig.components.length,
         util.plural(userConfig.components.length)));
 
-    var q = async.queue(createWorker(userConfig, baseDir), concurrency);
+    var q = async.queue(createWorker(userConfig, baseDir), config.concurrency);
 
     var shots = 0, failed = 0;
 
