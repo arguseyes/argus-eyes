@@ -93,7 +93,7 @@ module.exports = function compare(id1, id2) {
         // Report when verbose
         if (pixelsChanged > 0 && percentage > config.threshold) {
             differences++;
-            log.verbose(util.format(
+            log.warning(util.format(
                 "Difference (%d%) above threshold (%d%) found for: '%s'",
                 percentage.toFixed(2),
                 config.threshold,
