@@ -144,6 +144,9 @@ page.open(url, function(status) {
                 var clipRect = page.evaluate(function(component) {
                     try {
                         var rect = document.querySelector(component.selector).getBoundingClientRect();
+                        if (rect.width === 0 || rect.height === 0) {
+                            return false;
+                        }
                         return {
                             top: rect.top,
                             left: rect.left,
