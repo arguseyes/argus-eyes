@@ -7,7 +7,7 @@ var path           = require('path');
 var glob           = require('glob').sync;
 var rimraf         = require('rimraf').sync;
 var BlinkDiff      = require('blink-diff');
-var PNGImage       = require('pngjs-image');
+var getImageSize   = require('image-size');
 
 /**
  * Action `compare`
@@ -73,9 +73,9 @@ module.exports = function compare(id1, id2) {
             return;
         }
 
-        var img1 = PNGImage.readImageSync(file1);
-        var img2 = PNGImage.readImageSync(file2);
-        if (img1.getWidth() !== img2.getWidth() || img1.getHeight() !== img2.getHeight()) {
+        var img1 = getImageSize(file1);
+        var img2 = getImageSize(file2);
+        if (img1.width !== img2.width || img1.height !== img2.height) {
             log.verbose('Image dimensions differ left and right: ' + filename);
         }
 
