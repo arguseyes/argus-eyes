@@ -199,7 +199,6 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
     }
     // ...
   ],
-  concurrency: Number,   // [Optional] Number of concurrent PhantomJS instances
   finished-when: String  // [Optional] Valid JavaScript return statement
 }
 ```
