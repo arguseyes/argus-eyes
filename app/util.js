@@ -18,7 +18,8 @@ module.exports = {
     format,
     prefixStdStream,
     plural,
-    getFormattedDatetime
+    getFormattedDatetime,
+    slugify
 };
 
 /**
@@ -166,4 +167,15 @@ function plural(num) {
  */
 function getFormattedDatetime() {
     return (new Date).toISOString();
+}
+
+/**
+ * Transforms a string into a slug, containing only [a-z0-9_-]
+ * @param {String} str
+ * @returns {String}
+ */
+function slugify(str) {
+    return str.toLowerCase()
+        .replace(/[^\w-]+/g, '-')
+        .replace(/-+/g, '-');
 }

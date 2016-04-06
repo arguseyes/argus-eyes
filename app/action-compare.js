@@ -21,8 +21,6 @@ module.exports = function compare(id1, id2) {
 
     var config = argumentLoader.getConfig();
 
-    id1 = id1.replace('/', '-');
-    id2 = id2.replace('/', '-');
     var diffDirectory = config.base + '/diff_' + id1 + '_' + id2;
     var dir1 = glob(config.base + '/' + id1 + '/**/*.png');
     var dir2 = glob(config.base + '/' + id2 + '/**/*.png');

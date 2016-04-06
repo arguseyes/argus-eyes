@@ -45,12 +45,12 @@ function getAction() {
 
     // `argus-eyes capture <name>`
     if (posArgs.length === 2 && (posArgs[0] === 'capture' || posArgs[0] === 'add')) {
-        return ['capture', posArgs[1]];
+        return ['capture', util.slugify(posArgs[1])];
     }
 
     // `argus-eyes compare <name1> <name2>`
     if (posArgs.length === 3 && posArgs[0] === 'compare') {
-        return ['compare', posArgs[1], posArgs[2]];
+        return ['compare', util.slugify(posArgs[1]), util.slugify(posArgs[2])];
     }
 
     // `argus-eyes configtest`

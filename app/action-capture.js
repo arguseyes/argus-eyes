@@ -22,7 +22,6 @@ module.exports = function capture(id, cb) {
     var config = argumentLoader.getConfig();
     var userConfig = userCfgLoader.getUserConfig();
 
-    id = id.replace('/', '-');
     var baseDir = config.base + '/' + id;
     if (util.directoryExists(baseDir)) {
         rimraf(baseDir);

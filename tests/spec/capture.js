@@ -160,12 +160,13 @@ describe('Action: Capture', function() {
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'capture',
             'test1/test2',
-            '--config=' + normalize(__dirname + '/../fixtures/capture/valid.json')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/slugified-identifiers/slugified-identifiers.json')
         ], { encoding: 'utf8' });
 
         assert.equal(proc.status, 0, 'Exitcode not 0!');
         assert.equal(/saved \d screenshot/i.test(proc.stdout), true, "string not found: 'saved x screenshots'");
         assert.equal(glob('.argus-eyes/*')[0], '.argus-eyes/test1-test2', 'Correct directory not found!');
+        assert.equal(glob('.argus-eyes/test1-test2/320x480/*')[0], '.argus-eyes/test1-test2/320x480/pages-contact', 'Correct directory not found!');
 
     });
 

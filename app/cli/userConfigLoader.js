@@ -34,6 +34,9 @@ function getUserConfig() {
     // This function throws on error
     validateUserConfig(userConfig);
 
+    // Slugify page and component identifiers
+    userConfig = slugifyUserConfig(userConfig);
+
     return userConfig;
 
 }
@@ -104,4 +107,26 @@ function validateUserConfig(userConfig) {
 
     return true;
 
+}
+
+/**
+ * Slugify page and component identifiers
+ *
+ * @param {UserConfig} userConfig
+ * @returns {UserConfig}
+ */
+function slugifyUserConfig(userConfig) {
+
+    userConfig.pages = userConfig.pages.map(page => {
+        page.name = util.slugify(page.name);
+        page.components = page.components.map(componentName => util.slugify(componentName));
+        return page;
+    });
+
+    userConfig.components = userConfig.components.map(component => {
+        component.name = util.slugify(component.name);
+        return component;
+    });
+
+    return userConfig;
 }
