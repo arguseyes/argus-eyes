@@ -5,7 +5,7 @@ Build status:
 
 | Linux & Mac OS X | Windows |
 | --- | --- |
-| [![build status](https://travis-ci.org/branneman/argus-eyes.svg)](https://travis-ci.org/branneman/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/branneman/argus-eyes?branch=master&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
+| [![build status](https://travis-ci.org/arguseyes/argus-eyes.svg)](https://travis-ci.org/arguseyes/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/arguseyes/argus-eyes?branch=master&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
 
 <!-- start -->
 A lightweight commandline tool for visual regression testing of UI components.
