@@ -276,6 +276,9 @@ hit. The [Compare](#compare) action might be using this in the future as well.
 $ argus-eyes capture feature/navigation --concurrency=25
 ```
 
+**Be advised**: A higher concurrency isn’t always the better option. Be careful with increasing the concurrency,
+PhantomJS takes a lot of memory and it will affect the performance negatively if you run out of memory.
+
 #### Base
 
 _Default:_ **`.argus-eyes`**
