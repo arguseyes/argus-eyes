@@ -37,15 +37,15 @@
   },
   "homepage": "https://github.com/arguseyes/argus-eyes#readme",
   "dependencies": {
-    "async": "^2.0.0-rc.2",
+    "async": "^2.0.0-rc.3",
     "blink-diff": "^1.0.12",
     "chalk": "^1.1.1",
-    "glob": "^6.0.4",
+    "glob": "^7.0.3",
     "image-size": "^0.5.0",
     "mkdirp": "^0.5.1",
     "phantomjs-prebuilt": "^2.1.4",
     "rimraf": "^2.5.0",
-    "yargs": "^3.32.0"
+    "yargs": "^4.4.0"
   },
   "devDependencies": {
     "http-server": "^0.9.0",
