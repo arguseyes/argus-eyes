@@ -116,7 +116,7 @@ page.open(url, function(status) {
 
             invoker(isRemoved, function(err) {
                 if (err) {
-                    console.log('Unable to remove DOM element: \'' + component.ignore + '\'' +
+                    console.log('Unable to hide DOM element: \'' + component.ignore + '\'' +
                         ', timed out after ' + (maxTries * tryTimeout) + ' ms.');
                     return phantom.exit(1);
                 }
