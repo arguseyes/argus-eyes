@@ -26,16 +26,16 @@
     "phantomjs",
     "phantomcss"
   ],
-  "author": "Bran van der Meer <branmovic@gmail.com> (http://bran.name/)",
   "contributors": [
-    "Maarten Groeneweg <mgroeneweg@mirabeau.nl>",
-    "Marius de Corte <mdecorte@gmail.com> (http://mariusdecorte.nl)"
+    "Bran van der Meer <branmovic@gmail.com> (http://bran.name/)",
+    "Maarten Groeneweg <maarten@groeneweg.eu> (http://www.lazytesting.com/)",
+    "Christiaan Stegeman <c.stegeman@gmail.com>"
   ],
   "license": "CC-BY-4.0",
   "bugs": {
     "url": "https://github.com/arguseyes/argus-eyes/issues"
   },
-  "homepage": "https://github.com/arguseyes/argus-eyes#readme",
+  "homepage": "http://arguseyes.io/",
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "blink-diff": "^1.0.12",

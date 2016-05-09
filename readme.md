@@ -11,6 +11,7 @@ A lightweight commandline tool for visual regression testing of UI components.
 
 - [Overview](#overview)
 - [Introduction](#introduction)
+- [Authors](#authors)
 - [Guide](#guide)
   - [Install](#install)
   - [Step 1: Setup config file](#step-1-setup-config-file)
@@ -58,6 +59,19 @@ branches and do a new `$ argus-eyes capture dev`.
 To compare the 2 sets you run `$ argus-eyes compare master dev`, that's it! Argus eyes now checks all supposedly
 identical screenshots for visual differences. If differences were found, a new folder **`.argus-eyes/diff_master_dev`**
 is created. This folder contains overlay-images of the offending components, highlighting their differences in red.
+<!-- end -->
+
+
+<!-- start -->
+## Authors
+
+The initial idea and continued vision is a shared responsibility between Maarten Groeneweg and
+[Bran van der Meer](http://bran.name/).
+
+We strongly believe a visual regression tool should be looking for the sweet spot in collaboration between a Front-End
+Developer and a Test Engineer. That’s why we started working on Argus Eyes together.
+
+For a list of all contributors, see the [contributor graph](https://github.com/arguseyes/argus-eyes/graphs/contributors).
 <!-- end -->
 
 
