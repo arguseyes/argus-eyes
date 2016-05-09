@@ -1,20 +1,32 @@
+# Test against these versions of Node.js
 language: cpp
 env:
   - NODE_VERSION="4.0"
   - NODE_VERSION="4"
   - NODE_VERSION="5.0"
   - NODE_VERSION="5"
+  - NODE_VERSION="6.0"
+  - NODE_VERSION="6"
 os:
   - linux
   - osx
 matrix:
   fast_finish: true
+
+# Clone repo and install Node.js
 before_install:
   - git clone https://github.com/creationix/nvm.git /tmp/.nvm;
     source /tmp/.nvm/nvm.sh;
     nvm install $NODE_VERSION;
     nvm use --delete-prefix $NODE_VERSION;
+
+# Install scripts
 install:
   - npm install
+  - node --version
+  - npm --version
+  - node -e "console.log(require('child_process').execFileSync(require('phantomjs-prebuilt').path, ['--version'], {encoding:'utf8'}));"
+
+# Application test scripts
 script:
   - npm test
