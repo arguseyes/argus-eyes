@@ -68,8 +68,8 @@ is created. This folder contains overlay-images of the offending components, hig
 The initial idea and continued vision is a shared responsibility between Maarten Groeneweg and
 [Bran van der Meer](http://bran.name/).
 
-We strongly believe a visual regression tool should be looking for the sweet spot in collaboration between a Front-End
-Developer and a Test Engineer. That’s why we started working on Argus Eyes together.
+We strongly believe a visual regression testing tool should be looking for the sweet spot in collaboration between a
+Front-End Developer and a Test Engineer. That’s why we started working on Argus Eyes together.
 
 For a list of all contributors, see the [contributor graph](https://github.com/arguseyes/argus-eyes/graphs/contributors).
 <!-- end -->
