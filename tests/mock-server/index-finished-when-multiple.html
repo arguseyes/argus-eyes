@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        .header, .footer {
+            display: block;
+            margin: 25px;
+        }
+        .header {
+            width: 250px;
+            height: 100px;
+            background: crimson;
+        }
+        .footer {
+            width: 100px;
+            height: 250px;
+            background: crimson;
+        }
+        .footer.active1 {
+            background: mediumaquamarine;
+        }
+        .footer.active1.active2 {
+            background: steelblue;
+        }
+        .footer.active1.active2.active3 {
+            background: royalblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="header"></div>
+    <div class="footer"></div>
+    <script>
+        setTimeout(function() {
+            document.querySelector('.footer').classList.add('active1');
+            window._finishedWhen1 = true;
+        }, 1500);
+        setTimeout(function() {
+            document.querySelector('.footer').classList.add('active2');
+            window._finishedWhen2 = true;
+        }, 3000);
+        setTimeout(function() {
+            document.querySelector('.footer').classList.add('active3');
+            window._finishedWhen3 = true;
+        }, 4500);
+    </script>
+</body>
+</html>

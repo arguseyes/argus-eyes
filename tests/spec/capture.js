@@ -100,7 +100,7 @@ describe('Action: Capture', function() {
 
     });
 
-    it('should wait for finished-when', function() {
+    it('should wait for a global finished-when', function() {
 
         var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
@@ -116,6 +116,33 @@ describe('Action: Capture', function() {
             'baseline',
             'test-generated',
             '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+        ], { encoding: 'utf8' });
+
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
+
+    });
+
+    it('should wait for multiple finished-when', function() {
+
+        var procCapture = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'capture',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when-multiple.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+        ], { encoding: 'utf8' });
+
+        var procCompare = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when-multiple.json'),
             '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
         ], { encoding: 'utf8' });
 

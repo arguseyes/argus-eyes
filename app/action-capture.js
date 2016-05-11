@@ -98,18 +98,33 @@ function queueWorker(userConfig, baseDir, task, cb) {
 
     log.verbose(logPrefix(util.format('Starting PhantomJS')));
 
+    var pageJSON = JSON.stringify(task.page);
     var componentsJSON = JSON.stringify(task.page.components.map(componentId =>
         userConfig.components.find(component => component.name === componentId)));
 
-    // Run PhantomJS and take screenshot
+    // Build PhantomJS command and arguments
     var args = [
         __dirname + '/phantomjs-script.js',
         task.page.url,
         pageBase,
         task.size,
+        pageJSON,
         componentsJSON,
         (userConfig['finished-when'] || 'return true')
     ];
+
+    // Test argument length
+    var cmd = (phantomjsPath + " '" + args.join("' '") + "'");
+    log.verbose(cmd);
+    if (cmd.length > 2048) {
+        log.error(logPrefix('Exceeded maximum safe argument length of 2048, could not start PhantomJS'));
+        log.error(cmd);
+        cb(null, { shots: 0, failed: task.page.components.length });
+        cb = () => {};
+        return;
+    }
+
+    // Run PhantomJS and take screenshot
     var proc = child_process.spawn(phantomjsPath, args, { encoding: 'utf8' });
 
     // Collect standard streams

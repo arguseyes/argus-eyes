@@ -3,7 +3,9 @@
   "pages": [
     {
       "name": "homepage",
-      "components": ["header", "footer"]
+      "url": "http://localhost:6530/",
+      "components": ["header", "footer"],
+      "finished-when": 2
     }
   ],
   "components": [
@@ -13,7 +15,8 @@
     },
     {
       "name": "footer",
-      "selector": ".footer"
+      "selector": ".footer",
+      "finished-when": []
     }
   ],
   "finished-when": true

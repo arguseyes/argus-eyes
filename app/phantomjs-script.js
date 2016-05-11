@@ -1,3 +1,5 @@
+var async = require('async');
+
 // 10s timeout on this script
 setTimeout(function() {
     return phantom.exit(1);
@@ -13,11 +15,12 @@ var tryTimeout = 100;
 var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
-var url        = system.args[1];
-var pageBase   = system.args[2];
-var size       = system.args[3].split('x');
-var components = JSON.parse(system.args[4]);
-var userScript = system.args[5];
+var url          = system.args[1];
+var pageBase     = system.args[2];
+var size         = system.args[3].split('x');
+var userPage     = JSON.parse(system.args[4]);
+var components   = JSON.parse(system.args[5]);
+var finishedWhen = system.args[6];
 
 page.viewportSize = {
     width: size[0],
@@ -28,6 +31,9 @@ page.onConsoleMessage = function(msg) {
     console.log('console: ' + msg);
 };
 
+/**
+ * PhantomJS script
+ */
 page.open(url, function(status) {
 
     if (status !== 'success') {
@@ -35,162 +41,221 @@ page.open(url, function(status) {
         return phantom.exit(1);
     }
 
-    // Initalize PhantomJS script
-    waitForLoad();
-
-    /**
-     * Wait for the ready state 'complete'
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function waitForLoad() {
-
-        var isLoaded = function() {
-            var readyState = page.evaluate(function() {
-                return document.readyState;
-            });
-            return readyState === 'complete';
-        };
-
-        invoker(isLoaded, function(err) {
-            if (err) {
-                console.log('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout) + 'ms.');
-                return phantom.exit(1);
-            }
-            waitForUserScript();
-        });
-    }
-
-    /**
-     * Wait for the user script to report the page is ready for a screenshot
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function waitForUserScript() {
-
-        var isFinished = function() {
-            return page.evaluate(function(userScript) {
-                return (Function(userScript))();
-            }, userScript);
-        };
-
-        invoker(isFinished, function(err) {
-            if (err) {
-                console.log('finished-when userscript still not completed, timed out after ' +
-                    (maxTries * tryTimeout) + ' ms.');
-                return phantom.exit(1);
-            }
-            tryRemoveIgnores();
-        });
-    }
-
-    /**
-     * Removes any ignored elements from the DOM
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function tryRemoveIgnores() {
-
-        var count = components.length;
-        var done = function() {
-            if (--count === 0) {
-                done = function() {};
-                tryClipRect();
-            }
-        };
-
-        components.forEach(function(component) {
-
-            if (!component.ignore || !component.ignore.length) return done();
-
-            var isRemoved = function() {
-                return page.evaluate(function(baseSelector, ignore) {
-                    try {
-                        ignore.forEach(function(selector) {
-                            var element = document.querySelector(baseSelector + ' ' + selector);
-                            element.style.display = 'none';
-                        });
-                        return true;
-                    } catch (e) {
-                        return false;
-                    }
-                }, component.selector, component.ignore);
-            };
-
-            invoker(isRemoved, function(err) {
-                if (err) {
-                    console.log('Unable to hide DOM element: \'' + component.ignore + '\'' +
-                        ', timed out after ' + (maxTries * tryTimeout) + ' ms.');
-                    return phantom.exit(1);
-                }
-                done();
-            });
-
-        });
-    }
-
-    /**
-     * Clip element and save as .png file
-     *  Repeatedly invoked until it succeeds or maxTries is reached.
-     */
-    function tryClipRect() {
-
-        var count = components.length;
-        var done = function() {
-            if (--count === 0) phantom.exit();
-        };
-
-        components.forEach(function(component) {
-
-            var clipRect = function() {
-
-                var clipRect = page.evaluate(function(component) {
-                    try {
-                        var rect = document.querySelector(component.selector).getBoundingClientRect();
-                        if (rect.width === 0 || rect.height === 0) {
-                            return false;
-                        }
-                        return {
-                            top: rect.top,
-                            left: rect.left,
-                            width: rect.width,
-                            height: rect.height
-                        };
-                    } catch (e) {
-                        return false;
-                    }
-                }, component);
-
-                if (!clipRect) return;
-                page.clipRect = clipRect;
-
-                try {
-                    page.render(pageBase + '/' + component.name + '.png', {
-                        format: 'png',
-                        quality: '0' // quality is file compression since png is lossless
-                    });
-                } catch (e) {
-                    return false;
-                }
-
-                return true;
-            };
-
-            invoker(clipRect, function(err) {
-                if (err) {
-                    console.log('Unable to clip component \'' + component.name + '\'' +
-                        ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
-                    return phantom.exit(1);
-                }
-                done();
-            });
-        });
-    }
+    async.waterfall([
+        waitForLoad,
+        waitForFinishedWhenGlobal,
+        waitForFinishedWhenPage,
+        waitForFinishedWhenComponents,
+        tryRemoveIgnores,
+        tryClipRect
+    ], function(err) {
+        if (err) {
+            console.log(err);
+            phantom.exit(1);
+        }
+        phantom.exit();
+    });
 
 });
+
+/**
+ * Wait for the ready state 'complete' (window.onload)
+ */
+function waitForLoad(cb) {
+    invoker(_isLoaded, function(err) {
+        if (err) {
+            return cb('document.readyState not \'completed\', timed out after ' + (maxTries * tryTimeout) + 'ms.');
+        }
+        cb();
+    });
+}
+
+/**
+ * Wait for the finished-when (global-level)
+ */
+function waitForFinishedWhenGlobal(cb) {
+    invoker(_isFinished(finishedWhen), function(err) {
+        if (err) {
+            return cb('finished-when (global-level) still not returning a truthy value, timed out after ' +
+                (maxTries * tryTimeout) + ' ms.');
+        }
+        cb();
+    });
+}
+
+/**
+ * Wait for the finished-when (page-level)
+ */
+function waitForFinishedWhenPage(cb) {
+    var finishedWhen = userPage['finished-when'] || 'return true;';
+    invoker(_isFinished(finishedWhen), function(err) {
+        if (err) {
+            return cb('finished-when (page-level) still not returning a truthy value, timed out after ' +
+                (maxTries * tryTimeout) + ' ms.');
+        }
+        cb();
+    });
+}
+
+/**
+ * Wait for the finished-when (component-level)
+ */
+function waitForFinishedWhenComponents(cb) {
+    async.parallel(components.map(function(component) {
+        return function(cb) {
+            if (!component['finished-when']) return cb();
+            invoker(_isFinished(component['finished-when']), function(err) {
+                if (err) {
+                    return cb('finished-when (component-level) still not returning a truthy value for component ' +
+                        '\'' + component.name + '\', timed out after ' + (maxTries * tryTimeout) + ' ms.');
+                }
+                cb();
+            });
+        };
+    }), function(err) {
+        cb(err);
+    });
+}
+
+/**
+ * Removes any ignored elements from the DOM
+ */
+function tryRemoveIgnores(cb) {
+    async.parallel(components.map(function(component) {
+        return function(cb) {
+            if (!component.ignore || !component.ignore.length) return cb();
+            invoker(_isRemoved(component), function(err) {
+                if (err) {
+                    return cb('Unable to hide DOM element: \'' + component.ignore + '\'' +
+                        ', timed out after ' + (maxTries * tryTimeout) + ' ms.');
+                }
+                cb();
+            });
+        };
+    }), function(err) {
+        cb(err);
+    });
+}
+
+/**
+ * Clip element and save as .png file
+ */
+function tryClipRect(cb) {
+    async.parallel(components.map(function(component) {
+        return function(cb) {
+            invoker(_clipRect(component), function(err) {
+                if (err) {
+                    return cb('Unable to clip component \'' + component.name + '\'' +
+                        ', timed out after ' + (maxTries * tryTimeout / 1e3) + ' ms.');
+                }
+                cb();
+            });
+        };
+    }), function(err) {
+        cb(err);
+    });
+}
+
+/**
+ * Returns whether window.onload has fired
+ *
+ * @private
+ * @returns {Boolean}
+ */
+function _isLoaded() {
+    var readyState = page.evaluate(function() {
+        return document.readyState;
+    });
+    return readyState === 'complete';
+}
+
+/**
+ * Call a finished-when user function body
+ *
+ * @private
+ * @param {String} finishedWhen
+ * @returns {Function}
+ */
+function _isFinished(finishedWhen) {
+    return function() {
+        return page.evaluate(function(finishedWhen) {
+            return (Function(finishedWhen))();
+        }, finishedWhen);
+    };
+}
+
+/**
+ * Returns a function that tries to hide a HTMLElement
+ *
+ * @private
+ * @param {{name: String, selector: String, ignore: String[]}} component
+ * @returns {Function}
+ */
+function _isRemoved(component) {
+    return function() {
+        return page.evaluate(function(baseSelector, ignore) {
+            try {
+                ignore.forEach(function(selector) {
+                    var element = document.querySelector(baseSelector + ' ' + selector);
+                    element.style.display = 'none';
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }, component.selector, component.ignore);
+    };
+}
+
+/**
+ * Sets the clipping rectangle for element screenshots
+ *
+ * @private
+ * @param {{name: String, selector: String, ignore: String[]}}component
+ * @returns {Function}
+ */
+function _clipRect(component) {
+    return function() {
+
+        var clipRect = page.evaluate(function(component) {
+            try {
+                var rect = document.querySelector(component.selector).getBoundingClientRect();
+                if (rect.width === 0 || rect.height === 0) {
+                    return false;
+                }
+                return {
+                    top: rect.top,
+                    left: rect.left,
+                    width: rect.width,
+                    height: rect.height
+                };
+            } catch (e) {
+                return false;
+            }
+        }, component);
+
+        if (!clipRect) return false;
+        page.clipRect = clipRect;
+
+        try {
+            page.render(pageBase + '/' + component.name + '.png', {
+                format: 'png',
+                quality: '0' // quality is file compression since png is lossless, 0 is maximum compression
+            });
+        } catch (e) {
+            return false;
+        }
+
+        return true;
+    };
+}
 
 /**
  * Invoker
  *  Repeatedly invokes a function until it returns a truthy value
  *
  * @see https://gist.github.com/branneman/53b820be519b54bfc30a
+ * @private
  * @param {Number} limit - The amount of total calls before we timeout
  * @param {Number} interval - The amount of milliseconds between calls
  * @param {Function} fn - The function to execute, must return a truthy value to indicate it's finished

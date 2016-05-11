@@ -1,0 +1,23 @@
+{
+  "sizes": ["768x1024"],
+  "finished-when": "return !!window._finishedWhen1;",
+  "pages": [
+    {
+      "name": "homepage",
+      "url": "http://localhost:6530/index-finished-when-multiple.html",
+      "components": ["header", "footer"],
+      "finished-when": "return !!window._finishedWhen2;"
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header",
+      "finished-when": "return !!window._finishedWhen3;"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer"
+    }
+  ]
+}

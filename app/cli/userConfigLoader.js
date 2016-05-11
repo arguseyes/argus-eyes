@@ -64,11 +64,6 @@ function validateUserConfig(userConfig) {
         }
     });
 
-    // Validate finished-when
-    if (typeof userConfig['finished-when'] !== 'undefined' && typeof userConfig['finished-when'] !== 'string') {
-        throw new Error('Config: finished-when must be a valid JavaScript string!');
-    }
-
     // Validate pages
     if (!Array.isArray(userConfig.pages) || userConfig.pages.length < 1) {
         throw new Error('Config: No pages found!');
@@ -103,6 +98,21 @@ function validateUserConfig(userConfig) {
                 throw new Error(util.format("Config: Component '%s' not found in page '%s'", component, page.name));
             }
         });
+    });
+
+    // Validate all finished-when levels
+    if (typeof userConfig['finished-when'] !== 'undefined' && typeof userConfig['finished-when'] !== 'string') {
+        throw new Error('Config: finished-when must be a valid JavaScript string!');
+    }
+    userConfig.pages.forEach(page => {
+        if (typeof page['finished-when'] !== 'undefined' && typeof page['finished-when'] !== 'string') {
+            throw new Error(util.format("Config: Page '%s' has an invalid finished-when!", page.name));
+        }
+    });
+    userConfig.components.forEach(component => {
+        if (typeof component['finished-when'] !== 'undefined' && typeof component['finished-when'] !== 'string') {
+            throw new Error(util.format("Config: Component '%s' has an invalid finished-when!", component.name));
+        }
     });
 
     return true;
