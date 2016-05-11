@@ -161,4 +161,20 @@ describe('Action: Configtest', function() {
 
     });
 
+    it('should fail with removed finished-when', function() {
+
+        var args = [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'configtest',
+            '--config=tests/fixtures/configtest/invalid-wait-for-script-finished-when.json'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
+        assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
+        assert.equal(/finished-when was renamed to wait-for-script/.test(proc.stdout), true, proc.stdout);
+
+    });
+
 });

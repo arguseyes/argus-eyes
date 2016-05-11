@@ -115,6 +115,22 @@ function validateUserConfig(userConfig) {
         }
     });
 
+    // Throw 'removed' errors for finished-when
+    var msg = 'Config: finished-when was renamed to wait-for-script in v0.6.0, please update your config';
+    if (typeof userConfig['finished-when'] !== 'undefined') {
+        throw new Error(msg);
+    }
+    userConfig.pages.forEach(page => {
+        if (typeof page['finished-when'] !== 'undefined') {
+            throw new Error(msg);
+        }
+    });
+    userConfig.components.forEach(component => {
+        if (typeof component['finished-when'] !== 'undefined') {
+            throw new Error(msg);
+        }
+    });
+
     return true;
 
 }
