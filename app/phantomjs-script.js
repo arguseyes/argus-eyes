@@ -15,12 +15,12 @@ var tryTimeout = 100;
 var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
-var url          = system.args[1];
-var pageBase     = system.args[2];
-var size         = system.args[3].split('x');
-var userPage     = JSON.parse(system.args[4]);
-var components   = JSON.parse(system.args[5]);
-var finishedWhen = system.args[6];
+var url           = system.args[1];
+var pageBase      = system.args[2];
+var size          = system.args[3].split('x');
+var userPage      = JSON.parse(system.args[4]);
+var components    = JSON.parse(system.args[5]);
+var waitForScript = system.args[6];
 
 page.viewportSize = {
     width: size[0],
@@ -43,9 +43,9 @@ page.open(url, function(status) {
 
     async.waterfall([
         waitForLoad,
-        waitForFinishedWhenGlobal,
-        waitForFinishedWhenPage,
-        waitForFinishedWhenComponents,
+        waitForScriptGlobal,
+        waitForScriptPage,
+        waitForScriptComponents,
         tryRemoveIgnores,
         tryClipRect
     ], function(err) {
@@ -71,12 +71,12 @@ function waitForLoad(cb) {
 }
 
 /**
- * Wait for the finished-when (global-level)
+ * Wait for the wait-for-script (global-level)
  */
-function waitForFinishedWhenGlobal(cb) {
-    invoker(_isFinished(finishedWhen), function(err) {
+function waitForScriptGlobal(cb) {
+    invoker(_isFinished(waitForScript), function(err) {
         if (err) {
-            return cb('finished-when (global-level) still not returning a truthy value, timed out after ' +
+            return cb('wait-for-script (global-level) still not returning a truthy value, timed out after ' +
                 (maxTries * tryTimeout) + ' ms.');
         }
         cb();
@@ -84,13 +84,13 @@ function waitForFinishedWhenGlobal(cb) {
 }
 
 /**
- * Wait for the finished-when (page-level)
+ * Wait for the wait-for-script (page-level)
  */
-function waitForFinishedWhenPage(cb) {
-    var finishedWhen = userPage['finished-when'] || 'return true;';
-    invoker(_isFinished(finishedWhen), function(err) {
+function waitForScriptPage(cb) {
+    var waitForScript = userPage['wait-for-script'] || 'return true;';
+    invoker(_isFinished(waitForScript), function(err) {
         if (err) {
-            return cb('finished-when (page-level) still not returning a truthy value, timed out after ' +
+            return cb('wait-for-script (page-level) still not returning a truthy value, timed out after ' +
                 (maxTries * tryTimeout) + ' ms.');
         }
         cb();
@@ -98,15 +98,15 @@ function waitForFinishedWhenPage(cb) {
 }
 
 /**
- * Wait for the finished-when (component-level)
+ * Wait for the wait-for-script (component-level)
  */
-function waitForFinishedWhenComponents(cb) {
+function waitForScriptComponents(cb) {
     async.parallel(components.map(function(component) {
         return function(cb) {
-            if (!component['finished-when']) return cb();
-            invoker(_isFinished(component['finished-when']), function(err) {
+            if (!component['wait-for-script']) return cb();
+            invoker(_isFinished(component['wait-for-script']), function(err) {
                 if (err) {
-                    return cb('finished-when (component-level) still not returning a truthy value for component ' +
+                    return cb('wait-for-script (component-level) still not returning a truthy value for component ' +
                         '\'' + component.name + '\', timed out after ' + (maxTries * tryTimeout) + ' ms.');
                 }
                 cb();
@@ -170,17 +170,17 @@ function _isLoaded() {
 }
 
 /**
- * Call a finished-when user function body
+ * Call a wait-for-script user function body
  *
  * @private
- * @param {String} finishedWhen
+ * @param {String} waitForScript
  * @returns {Function}
  */
-function _isFinished(finishedWhen) {
+function _isFinished(waitForScript) {
     return function() {
-        return page.evaluate(function(finishedWhen) {
-            return (Function(finishedWhen))();
-        }, finishedWhen);
+        return page.evaluate(function(waitForScript) {
+            return (Function(waitForScript))();
+        }, waitForScript);
     };
 }
 

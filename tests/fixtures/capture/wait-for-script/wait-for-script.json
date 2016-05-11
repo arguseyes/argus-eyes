@@ -1,10 +1,10 @@
 {
   "sizes": ["768x1024"],
-  "finished-when": "return !!window._finishedWhen;",
+  "wait-for-script": "return !!window._waitForScript;",
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:6530/index-finished-when.html",
+      "url": "http://localhost:6530/index-wait-for-script.html",
       "components": ["header", "footer"]
     }
   ],

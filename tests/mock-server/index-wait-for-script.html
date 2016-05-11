@@ -25,10 +25,10 @@
     <div class="header"></div>
     <div class="footer"></div>
     <script>
-        window._finishedWhen = false;
+        window._waitForScript = false;
         setTimeout(function() {
             document.querySelector('.footer').classList.add('active');
-            window._finishedWhen = true;
+            window._waitForScript = true;
         }, 1500);
     </script>
 </body>

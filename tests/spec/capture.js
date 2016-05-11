@@ -100,14 +100,14 @@ describe('Action: Capture', function() {
 
     });
 
-    it('should wait for a global finished-when', function() {
+    it('should wait for a global wait-for-script', function() {
 
         var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'capture',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/wait-for-script/wait-for-script.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/wait-for-script')
         ], { encoding: 'utf8' });
 
         var procCompare = spawnSync('node', [
@@ -115,8 +115,8 @@ describe('Action: Capture', function() {
             'compare',
             'baseline',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/wait-for-script/wait-for-script.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/wait-for-script')
         ], { encoding: 'utf8' });
 
         assert.equal(procCapture.status, 0, 'Exitcode not 0!');
@@ -127,14 +127,14 @@ describe('Action: Capture', function() {
 
     });
 
-    it('should wait for multiple finished-when', function() {
+    it('should wait for multiple wait-for-script', function() {
 
         var procCapture = spawnSync('node', [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'capture',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when-multiple.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/wait-for-script/wait-for-script-multiple.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/wait-for-script')
         ], { encoding: 'utf8' });
 
         var procCompare = spawnSync('node', [
@@ -142,8 +142,8 @@ describe('Action: Capture', function() {
             'compare',
             'baseline',
             'test-generated',
-            '--config=' + normalize(__dirname + '/../fixtures/capture/finished-when/finished-when-multiple.json'),
-            '--base=' + normalize(__dirname + '/../fixtures/capture/finished-when')
+            '--config=' + normalize(__dirname + '/../fixtures/capture/wait-for-script/wait-for-script-multiple.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/wait-for-script')
         ], { encoding: 'utf8' });
 
         assert.equal(procCapture.status, 0, 'Exitcode not 0!');

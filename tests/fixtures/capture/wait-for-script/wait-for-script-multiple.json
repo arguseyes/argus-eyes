@@ -1,19 +1,19 @@
 {
   "sizes": ["768x1024"],
-  "finished-when": "return !!window._finishedWhen1;",
+  "wait-for-script": "return !!window._waitForScript1;",
   "pages": [
     {
       "name": "homepage",
-      "url": "http://localhost:6530/index-finished-when-multiple.html",
+      "url": "http://localhost:6530/index-wait-for-script-multiple.html",
       "components": ["header", "footer"],
-      "finished-when": "return !!window._finishedWhen2;"
+      "wait-for-script": "return !!window._waitForScript2;"
     }
   ],
   "components": [
     {
       "name": "header",
       "selector": ".header",
-      "finished-when": "return !!window._finishedWhen3;"
+      "wait-for-script": "return !!window._waitForScript3;"
     },
     {
       "name": "footer",

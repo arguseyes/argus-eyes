@@ -213,13 +213,13 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
     }
     // ...
   ],
-  finished-when: String  // [Optional] Valid JavaScript return statement
+  wait-for-script: String  // [Optional] Valid JavaScript return statement
 }
 ```
 
-#### Finished when
+#### Wait for script
 
-If provided, the `finished-when` string must contain a return statement that evaluates to `true` whenever the page is
+If provided, the `wait-for-script` string must contain a return statement that evaluates to `true` whenever the page is
 ready to be captured, `false` if it's not yet. If omitted, it defaults to `return true`. Internally, this string is
 passed as the only argument to the
 [`Function()` function](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),

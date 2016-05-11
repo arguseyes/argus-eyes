@@ -110,7 +110,7 @@ function queueWorker(userConfig, baseDir, task, cb) {
         task.size,
         pageJSON,
         componentsJSON,
-        (userConfig['finished-when'] || 'return true')
+        (userConfig['wait-for-script'] || 'return true')
     ];
 
     // Test argument length

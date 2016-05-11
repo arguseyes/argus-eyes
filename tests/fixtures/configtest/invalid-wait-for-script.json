@@ -5,7 +5,7 @@
       "name": "homepage",
       "url": "http://localhost:6530/",
       "components": ["header", "footer"],
-      "finished-when": 2
+      "wait-for-script": 2
     }
   ],
   "components": [
@@ -16,8 +16,8 @@
     {
       "name": "footer",
       "selector": ".footer",
-      "finished-when": []
+      "wait-for-script": []
     }
   ],
-  "finished-when": true
+  "wait-for-script": true
 }

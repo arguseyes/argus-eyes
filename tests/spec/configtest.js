@@ -145,19 +145,19 @@ describe('Action: Configtest', function() {
 
     });
 
-    it('should fail with incorrect finished-when', function() {
+    it('should fail with incorrect wait-for-script', function() {
 
         var args = [
             normalize(__dirname + '/../../bin/argus-eyes.js'),
             'configtest',
-            '--config=tests/fixtures/configtest/invalid-finished-when.json'
+            '--config=tests/fixtures/configtest/invalid-wait-for-script.json'
         ];
 
         var proc = spawnSync('node', args, { encoding: 'utf8' });
 
         assert.equal(proc.status, 1, 'Exitcode not 1!');
         assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
-        assert.equal(/finished-when/.test(proc.stdout), true, proc.stdout);
+        assert.equal(/wait-for-script/.test(proc.stdout), true, proc.stdout);
 
     });
 

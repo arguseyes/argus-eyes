@@ -100,18 +100,18 @@ function validateUserConfig(userConfig) {
         });
     });
 
-    // Validate all finished-when levels
-    if (typeof userConfig['finished-when'] !== 'undefined' && typeof userConfig['finished-when'] !== 'string') {
-        throw new Error('Config: finished-when must be a valid JavaScript string!');
+    // Validate all wait-for-script levels
+    if (typeof userConfig['wait-for-script'] !== 'undefined' && typeof userConfig['wait-for-script'] !== 'string') {
+        throw new Error('Config: wait-for-script must be a valid JavaScript string!');
     }
     userConfig.pages.forEach(page => {
-        if (typeof page['finished-when'] !== 'undefined' && typeof page['finished-when'] !== 'string') {
-            throw new Error(util.format("Config: Page '%s' has an invalid finished-when!", page.name));
+        if (typeof page['wait-for-script'] !== 'undefined' && typeof page['wait-for-script'] !== 'string') {
+            throw new Error(util.format("Config: Page '%s' has an invalid wait-for-script!", page.name));
         }
     });
     userConfig.components.forEach(component => {
-        if (typeof component['finished-when'] !== 'undefined' && typeof component['finished-when'] !== 'string') {
-            throw new Error(util.format("Config: Component '%s' has an invalid finished-when!", component.name));
+        if (typeof component['wait-for-script'] !== 'undefined' && typeof component['wait-for-script'] !== 'string') {
+            throw new Error(util.format("Config: Component '%s' has an invalid wait-for-script!", component.name));
         }
     });
 
