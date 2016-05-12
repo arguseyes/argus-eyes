@@ -1,0 +1,23 @@
+{
+  "sizes": ["768x1024"],
+  "run-script": "scripts/script1.js",
+  "pages": [
+    {
+      "name": "homepage",
+      "url": "http://localhost:6530/index-run-script.html",
+      "components": ["header", "footer"],
+      "run-script": "scripts/script2.js"
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer",
+      "run-script": "scripts/script3.js"
+    }
+  ]
+}

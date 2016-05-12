@@ -222,8 +222,9 @@ By default, argus eyes takes the screenshots after the `window.onload` event. Wh
 loaded after that, you'll need to tell argus eyes what to wait for. This way you can make sure that everything has
 finished loading, rendering and animating at the moment the screenshot is taken.
 
-To simply wait for a fixed time, use `wait-for-delay`. For more complex situations, you can write JavaScript that
-returns a truthy value whenever the page is ready: see `wait-for-script`.
+To simply wait for a fixed time, use `wait-for-delay`. For more complex conditions, you can write JavaScript that
+returns a truthy value whenever the page is ready: see `wait-for-script`. If you've got any one-time actions such as
+components to activate or dialogs to close, you should use `run-script`.
 
 You are allowed to specify `wait-for-delay` and `wait-for-script` on 3 levels: global, page and component, when multiple
 are found, they're all executed in this order. It's also allowed to specify both a delay and a script. All scripts will
@@ -242,8 +243,8 @@ You can specify a JavaScript function body to tell argus eyes whenever the page 
 The `wait-for-script` string must contain a filename. If a relative path is given, it's relative to your config file.
 
 The contents of the script can be seen as a function body, without the `function() {` and `}` parts around it. You are
-required to return a truthy value to indicate argus eyes can take the screenshot. Your function is invoked continuously
-until it returns something truthy, or the global timeout expires.
+required to return a truthy value to indicate argus eyes can take the screenshot. Your function is **invoked
+continuously** until it returns something truthy, so be careful with saving state.
 
 Internally, the contents of the file are passed as a string to the
 [`Function()` constructor](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
@@ -258,6 +259,26 @@ thus an entire function body as a string is expected, and multiple lines are all
 ```js
 var isFinished = document.body.hasAttribute('data-finished-loading');
 return isFinished;
+```
+
+#### Run script
+
+The `run-script` option differs from `wait-for-script` in that it's only executed once, after any `wait-for-script`
+and `wait-for-delay`.
+
+Internally, the contents of the file are passed as a string to the
+[`Function()` constructor](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
+thus an entire function body as a string is expected, and multiple lines are allowed.
+
+**Example:**
+```json
+{ "run-script": "scripts/component-search-open.js" }
+```
+
+**scripts/component-search-open.js:**
+```js
+var search = document.querySelector('.header__search');
+search.classList.add('.header__search_is-open');
 ```
 
 

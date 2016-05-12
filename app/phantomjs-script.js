@@ -24,6 +24,7 @@ var userPage      = JSON.parse(system.args[5]);
 var components    = JSON.parse(system.args[6]);
 var delayScript   = system.args[7];
 var delayMs       = parseInt(system.args[8], 10);
+var userScript    = system.args[9];
 
 page.viewportSize = {
     width: size[0],
@@ -48,6 +49,7 @@ page.open(url, function(status) {
         waitForLoad,
         waitForScript,
         waitForDelay,
+        runUserScript,
         tryRemoveIgnores,
         tryClipRect
     ], function(err) {
@@ -81,7 +83,7 @@ function waitForScript(cb) {
 
     if (delayScript) {
         tasks.push(function(cb) {
-            invoker(_isFinished(delayScript), function(err) {
+            invoker(_callUserScript(delayScript), function(err) {
                 if (err) {
                     return cb('wait-for-script (global-level) still not returning a truthy value, timed out after ' +
                         (maxTries * tryTimeout) + ' ms.');
@@ -93,7 +95,7 @@ function waitForScript(cb) {
 
     if (userPage['wait-for-script']) {
         tasks.push(function(cb) {
-            invoker(_isFinished(userPage['wait-for-script']), function(err) {
+            invoker(_callUserScript(userPage['wait-for-script']), function(err) {
                 if (err) {
                     return cb('wait-for-script (page-level) still not returning a truthy value, timed out after ' +
                         (maxTries * tryTimeout) + ' ms.');
@@ -106,7 +108,7 @@ function waitForScript(cb) {
     components.forEach(function(component) {
         if (!component['wait-for-script']) return;
         tasks.push(function(cb) {
-            invoker(_isFinished(component['wait-for-script']), function(err) {
+            invoker(_callUserScript(component['wait-for-script']), function(err) {
                 if (err) {
                     return cb('wait-for-script (component-level) still not returning a truthy value for component ' +
                         '\'' + component.name + '\', timed out after ' + (maxTries * tryTimeout) + ' ms.');
@@ -138,6 +140,26 @@ function waitForDelay(cb) {
             }), function() { cb(); });
         }, delay);
     }, delayMs);
+}
+
+/**
+ * Run a user script
+ */
+function runUserScript(cb) {
+
+    if (userScript) {
+        _callUserScript(userScript)();
+    }
+    if (userPage['run-script']) {
+        _callUserScript(userPage['run-script'])();
+    }
+    components.forEach(function(component) {
+        if (component['run-script']) {
+            _callUserScript(component['run-script'])();
+        }
+    });
+
+    cb();
 }
 
 /**
@@ -193,13 +215,13 @@ function _isLoaded() {
 }
 
 /**
- * Call a wait-for-script user function script
+ * Call a user script inside a function
  *
  * @private
  * @param {String} scriptFilename
  * @returns {Function}
  */
-function _isFinished(scriptFilename) {
+function _callUserScript(scriptFilename) {
 
     var scriptPath = scriptFilename;
     if (!fs.isAbsolute(scriptPath)) {
