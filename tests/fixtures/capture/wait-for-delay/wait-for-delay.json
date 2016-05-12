@@ -1,0 +1,23 @@
+{
+  "sizes": ["768x1024"],
+  "wait-for-delay": 100,
+  "pages": [
+    {
+      "name": "homepage",
+      "url": "http://localhost:6530/index-wait-for-delay.html",
+      "components": ["header", "footer"],
+      "wait-for-delay": 250
+    }
+  ],
+  "components": [
+    {
+      "name": "header",
+      "selector": ".header"
+    },
+    {
+      "name": "footer",
+      "selector": ".footer",
+      "wait-for-delay": 3000
+    }
+  ]
+}

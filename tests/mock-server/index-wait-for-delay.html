@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        .header, .footer {
+            display: block;
+            margin: 25px;
+        }
+        .header {
+            width: 250px;
+            height: 100px;
+            background: crimson;
+        }
+        .footer {
+            width: 100px;
+            height: 250px;
+            background: crimson;
+        }
+        .footer.active {
+            background: royalblue;
+        }
+    </style>
+</head>
+<body>
+<div class="header"></div>
+<div class="footer"></div>
+<script>
+    setTimeout(function() {
+        document.querySelector('.footer').classList.add('active');
+    }, 2500);
+</script>
+</body>
+</html>

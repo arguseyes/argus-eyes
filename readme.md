@@ -188,15 +188,15 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
 ```js
 {
   sizes: [
-    String               // Size string, example: "1024x768"
+    String                 // Size string, example: "1024x768"
     // ...
   ],
   pages: [
     {
-      name: String,      // Identifier, used in filenames
-      url: String,       // Valid URL
+      name: String,        // Identifier, used in filenames
+      url: String,         // Valid URL
       components: [
-        String           // Component identifier
+        String             // Component identifier
         // ...
       ]
     }
@@ -204,26 +204,49 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
   ],
   components: [
     {
-      name: String,      // Identifier, used in page objects and filenames
-      selector: String,  // CSS selector, to clip the screenshot
-      ignore: [          // Optional array of excluded child elements
-        String           // CSS selector, to `display:none` a child element
+      name: String,        // Identifier, used in page objects and filenames
+      selector: String,    // CSS selector, to clip the screenshot
+      ignore: [            // [Optional] Array of excluded child elements
+        String             // CSS selector, to `display:none` a child element
         // ...
       ]
     }
     // ...
   ],
+  wait-for-delay: Number   // [Optional] Number of milliseconds to wait
   wait-for-script: String  // [Optional] Valid JavaScript return statement
 }
 ```
 
+Argus eyes takes the screenshots after the `window.onload` event (`document.readyState === 'complete'`) by default. When
+parts of your website are still being loaded after that, you'll need to tell argus eyes what to wait for. This way you
+can be sure that everything has finished loading, rendering and animating at the moment the screenshot is taken.
+
+To simply wait for a fixed time, use `wait-for-delay`. For more complex situations, you can write JavaScript that
+returns a truthy value whenever the page is ready: see `wait-for-script`.
+
+You are allowed to specify `wait-for-delay` and `wait-for-script` on 3 levels: global, page and component, when multiple
+are found, they're all executed in this order. It's also allowed to specify both a delay and a script. All scripts will
+always be executed before all delays.
+
+
+#### Wait for delay
+
+This will delay taking the screenshots, specify the milliseconds as a JavaScript number.
+
 #### Wait for script
 
-If provided, the `wait-for-script` string must contain a return statement that evaluates to `true` whenever the page is
-ready to be captured, `false` if it's not yet. If omitted, it defaults to `return true`. Internally, this string is
-passed as the only argument to the
+You can specify a JavaScript function body to hint argus eyes whenever the page and it's components are finished loading.
+The `wait-for-script` string must contain a return statement that evaluates to `true` eventually. If omitted, it
+defaults to `return true`.
+
+Internally, this string is passed as the only argument to the
 [`Function()` function](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
-thus an entire function body is expected and multiple lines are allowed.
+thus an entire function body as a string is expected, and multiple lines are allowed. Example:
+
+```json
+{ "wait-for-script": "return document.body.hasAttribute('data-finished-loading');" }
+```
 
 
 ### Usage

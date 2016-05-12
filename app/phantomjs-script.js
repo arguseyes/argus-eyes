@@ -21,6 +21,7 @@ var size          = system.args[3].split('x');
 var userPage      = JSON.parse(system.args[4]);
 var components    = JSON.parse(system.args[5]);
 var waitForScript = system.args[6];
+var waitForDelay  = parseInt(system.args[7], 10);
 
 page.viewportSize = {
     width: size[0],
@@ -46,6 +47,7 @@ page.open(url, function(status) {
         waitForScriptGlobal,
         waitForScriptPage,
         waitForScriptComponents,
+        waitForDelayMs,
         tryRemoveIgnores,
         tryClipRect
     ], function(err) {
@@ -115,6 +117,27 @@ function waitForScriptComponents(cb) {
     }), function(err) {
         cb(err);
     });
+}
+
+/**
+ * Wait for the wait-for-delay (in milliseconds)
+ */
+function waitForDelayMs(cb) {
+
+    // Wait for - level global
+    setTimeout(function() {
+
+        // Wait for - level page
+        var delay = parseInt(userPage['wait-for-delay'], 10) || 0;
+        setTimeout(function() {
+
+            // Wait for - level components
+            async.waterfall(components.map(function(component) {
+                var delay = parseInt(component['wait-for-delay'], 10) || 0;
+                return function(cb) { setTimeout(cb, delay); };
+            }), function() { cb(); });
+        }, delay);
+    }, waitForDelay);
 }
 
 /**

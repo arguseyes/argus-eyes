@@ -115,6 +115,21 @@ function validateUserConfig(userConfig) {
         }
     });
 
+    // Validate all wait-for-delay levels
+    if (typeof userConfig['wait-for-delay'] !== 'undefined' && typeof userConfig['wait-for-delay'] !== 'number') {
+        throw new Error('Config: wait-for-delay must be a valid JavaScript number!');
+    }
+    userConfig.pages.forEach(page => {
+        if (typeof page['wait-for-delay'] !== 'undefined' && typeof page['wait-for-delay'] !== 'number') {
+            throw new Error(util.format("Config: Page '%s' has an invalid wait-for-delay!", page.name));
+        }
+    });
+    userConfig.components.forEach(component => {
+        if (typeof component['wait-for-delay'] !== 'undefined' && typeof component['wait-for-delay'] !== 'number') {
+            throw new Error(util.format("Config: Component '%s' has an invalid wait-for-delay!", component.name));
+        }
+    });
+
     // Throw 'removed' errors for finished-when
     var msg = 'Config: finished-when was renamed to wait-for-script in v0.6.0, please update your config';
     if (typeof userConfig['finished-when'] !== 'undefined') {

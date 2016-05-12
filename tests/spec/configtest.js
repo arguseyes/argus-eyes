@@ -161,6 +161,22 @@ describe('Action: Configtest', function() {
 
     });
 
+    it('should fail with incorrect wait-for-delay', function() {
+
+        var args = [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'configtest',
+            '--config=tests/fixtures/configtest/invalid-wait-for-delay.json'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
+        assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
+        assert.equal(/wait-for-delay/.test(proc.stdout), true, proc.stdout);
+
+    });
+
     it('should fail with removed finished-when', function() {
 
         var args = [
