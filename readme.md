@@ -254,7 +254,7 @@ thus an entire function body as a string is expected, and multiple lines are all
 { "wait-for-script": "scripts/page-finished-loading.js" }
 ```
 
-**scripts/page-finished-loading.js**
+**scripts/page-finished-loading.js:**
 ```js
 var isFinished = document.body.hasAttribute('data-finished-loading');
 return isFinished;
