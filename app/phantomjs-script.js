@@ -22,8 +22,8 @@ var pageBase      = system.args[3];
 var size          = system.args[4].split('x');
 var userPage      = JSON.parse(system.args[5]);
 var components    = JSON.parse(system.args[6]);
-var waitForScript = system.args[7];
-var waitForDelay  = parseInt(system.args[8], 10);
+var delayScript   = system.args[7];
+var delayMs       = parseInt(system.args[8], 10);
 
 page.viewportSize = {
     width: size[0],
@@ -46,10 +46,8 @@ page.open(url, function(status) {
 
     async.waterfall([
         waitForLoad,
-        waitForScriptGlobal,
-        waitForScriptPage,
-        waitForScriptComponents,
-        waitForDelayMs,
+        waitForScript,
+        waitForDelay,
         tryRemoveIgnores,
         tryClipRect
     ], function(err) {
@@ -75,40 +73,39 @@ function waitForLoad(cb) {
 }
 
 /**
- * Wait for the wait-for-script (global-level)
+ * Wait for the wait-for-script
  */
-function waitForScriptGlobal(cb) {
-    if (!waitForScript) return cb();
-    invoker(_isFinished(waitForScript), function(err) {
-        if (err) {
-            return cb('wait-for-script (global-level) still not returning a truthy value, timed out after ' +
-                (maxTries * tryTimeout) + ' ms.');
-        }
-        cb();
-    });
-}
+function waitForScript(cb) {
 
-/**
- * Wait for the wait-for-script (page-level)
- */
-function waitForScriptPage(cb) {
-    if (!userPage['wait-for-script']) return cb();
-    invoker(_isFinished(userPage['wait-for-script']), function(err) {
-        if (err) {
-            return cb('wait-for-script (page-level) still not returning a truthy value, timed out after ' +
-                (maxTries * tryTimeout) + ' ms.');
-        }
-        cb();
-    });
-}
+    var tasks = [];
 
-/**
- * Wait for the wait-for-script (component-level)
- */
-function waitForScriptComponents(cb) {
-    async.parallel(components.map(function(component) {
-        return function(cb) {
-            if (!component['wait-for-script']) return cb();
+    if (delayScript) {
+        tasks.push(function(cb) {
+            invoker(_isFinished(delayScript), function(err) {
+                if (err) {
+                    return cb('wait-for-script (global-level) still not returning a truthy value, timed out after ' +
+                        (maxTries * tryTimeout) + ' ms.');
+                }
+                cb();
+            });
+        });
+    }
+
+    if (userPage['wait-for-script']) {
+        tasks.push(function(cb) {
+            invoker(_isFinished(userPage['wait-for-script']), function(err) {
+                if (err) {
+                    return cb('wait-for-script (page-level) still not returning a truthy value, timed out after ' +
+                        (maxTries * tryTimeout) + ' ms.');
+                }
+                cb();
+            });
+        });
+    }
+
+    components.forEach(function(component) {
+        if (!component['wait-for-script']) return;
+        tasks.push(function(cb) {
             invoker(_isFinished(component['wait-for-script']), function(err) {
                 if (err) {
                     return cb('wait-for-script (component-level) still not returning a truthy value for component ' +
@@ -116,16 +113,16 @@ function waitForScriptComponents(cb) {
                 }
                 cb();
             });
-        };
-    }), function(err) {
-        cb(err);
+        });
     });
+
+    async.waterfall(tasks, function(err) { cb(err); });
 }
 
 /**
  * Wait for the wait-for-delay (in milliseconds)
  */
-function waitForDelayMs(cb) {
+function waitForDelay(cb) {
 
     // Wait for - level global
     setTimeout(function() {
@@ -140,7 +137,7 @@ function waitForDelayMs(cb) {
                 return function(cb) { setTimeout(cb, delay); };
             }), function() { cb(); });
         }, delay);
-    }, waitForDelay);
+    }, delayMs);
 }
 
 /**
