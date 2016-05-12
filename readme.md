@@ -240,6 +240,8 @@ You can specify a JavaScript function body to hint argus eyes whenever the page 
 The `wait-for-script` string must contain a return statement that evaluates to `true` eventually. If omitted, it
 defaults to `return true`.
 
+This script is invoked continuously until it returns a truthy value, or the timeout expires.
+
 Internally, this string is passed as the only argument to the
 [`Function()` function](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
 thus an entire function body as a string is expected, and multiple lines are allowed. Example:
