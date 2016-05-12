@@ -1,19 +1,19 @@
 {
   "sizes": ["768x1024"],
-  "wait-for-script": "return !!window._waitForScript1;",
+  "wait-for-script": "scripts/script1.js",
   "pages": [
     {
       "name": "homepage",
       "url": "http://localhost:6530/index-wait-for-script-multiple.html",
       "components": ["header", "footer"],
-      "wait-for-script": "return !!window._waitForScript2;"
+      "wait-for-script": "scripts/script2.js"
     }
   ],
   "components": [
     {
       "name": "header",
       "selector": ".header",
-      "wait-for-script": "return !!window._waitForScript3;"
+      "wait-for-script": "scripts/script3.js"
     },
     {
       "name": "footer",

@@ -187,40 +187,40 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
 
 ```js
 {
-  sizes: [
-    String                 // Size string, example: "1024x768"
+  "sizes": [
+    String                   // Size string, example: "1024x768"
     // ...
   ],
-  pages: [
+  "pages": [
     {
-      name: String,        // Identifier, used in filenames
-      url: String,         // Valid URL
-      components: [
-        String             // Component identifier
+      "name": String,        // Identifier, used in filenames
+      "url": String,         // Valid URL
+      "components": [
+        String               // Component identifier
         // ...
       ]
     }
     // ...
   ],
-  components: [
+  "components": [
     {
-      name: String,        // Identifier, used in page objects and filenames
-      selector: String,    // CSS selector, to clip the screenshot
-      ignore: [            // [Optional] Array of excluded child elements
-        String             // CSS selector, to `display:none` a child element
+      "name": String,        // Identifier, used in page objects and filenames
+      "selector": String,    // CSS selector, to clip the screenshot
+      "ignore": [            // [Optional] Array of excluded child elements
+        String               // CSS selector, to `display:none` a child element
         // ...
       ]
     }
     // ...
   ],
-  wait-for-delay: Number   // [Optional] Number of milliseconds to wait
-  wait-for-script: String  // [Optional] Valid JavaScript return statement
+  "wait-for-delay": Number   // [Optional] Number of milliseconds to wait
+  "wait-for-script": String  // [Optional] Valid JavaScript return statement
 }
 ```
 
-Argus eyes takes the screenshots after the `window.onload` event (`document.readyState === 'complete'`) by default. When
-parts of your website are still being loaded after that, you'll need to tell argus eyes what to wait for. This way you
-can be sure that everything has finished loading, rendering and animating at the moment the screenshot is taken.
+By default, argus eyes takes the screenshots after the `window.onload` event. When parts of your site are still being
+loaded after that, you'll need to tell argus eyes what to wait for. This way you can make sure that everything has
+finished loading, rendering and animating at the moment the screenshot is taken.
 
 To simply wait for a fixed time, use `wait-for-delay`. For more complex situations, you can write JavaScript that
 returns a truthy value whenever the page is ready: see `wait-for-script`.
@@ -229,6 +229,8 @@ You are allowed to specify `wait-for-delay` and `wait-for-script` on 3 levels: g
 are found, they're all executed in this order. It's also allowed to specify both a delay and a script. All scripts will
 always be executed before all delays.
 
+There's a global timeout of 10 seconds on the PhantomJS script, the screenshots should be taken within that time.
+
 
 #### Wait for delay
 
@@ -236,18 +238,26 @@ This will delay taking the screenshots, specify the milliseconds as a JavaScript
 
 #### Wait for script
 
-You can specify a JavaScript function body to hint argus eyes whenever the page and it's components are finished loading.
-The `wait-for-script` string must contain a return statement that evaluates to `true` eventually. If omitted, it
-defaults to `return true`.
+You can specify a JavaScript function body to tell argus eyes whenever the page and it's components are finished loading.
+The `wait-for-script` string must contain a filename. If a relative path is given, it's relative to your config file.
 
-This script is invoked continuously until it returns a truthy value, or the timeout expires.
+The contents of the script can be seen as a function body, without the `function() {` and `}` parts around it. You are
+required to return a truthy value to indicate argus eyes can take the screenshot. Your function is invoked continuously
+until it returns something truthy, or the global timeout expires.
 
-Internally, this string is passed as the only argument to the
-[`Function()` function](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
-thus an entire function body as a string is expected, and multiple lines are allowed. Example:
+Internally, the contents of the file are passed as a string to the
+[`Function()` constructor](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
+thus an entire function body as a string is expected, and multiple lines are allowed.
 
+**Example:**
 ```json
-{ "wait-for-script": "return document.body.hasAttribute('data-finished-loading');" }
+{ "wait-for-script": "scripts/page-finished-loading.js" }
+```
+
+**scripts/page-finished-loading.js**
+```js
+var isFinished = document.body.hasAttribute('data-finished-loading');
+return isFinished;
 ```
 
 

@@ -1,6 +1,6 @@
 {
   "sizes": ["768x1024"],
-  "wait-for-script": "return !!window._waitForScript;",
+  "wait-for-script": "scripts/script1.js",
   "pages": [
     {
       "name": "homepage",

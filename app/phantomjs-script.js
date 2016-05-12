@@ -1,4 +1,5 @@
 var async = require('async');
+var fs = require('fs');
 
 // 10s timeout on this script
 setTimeout(function() {
@@ -15,13 +16,14 @@ var tryTimeout = 100;
 var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
-var url           = system.args[1];
-var pageBase      = system.args[2];
-var size          = system.args[3].split('x');
-var userPage      = JSON.parse(system.args[4]);
-var components    = JSON.parse(system.args[5]);
-var waitForScript = system.args[6];
-var waitForDelay  = parseInt(system.args[7], 10);
+var basePath      = system.args[1];
+var url           = system.args[2];
+var pageBase      = system.args[3];
+var size          = system.args[4].split('x');
+var userPage      = JSON.parse(system.args[5]);
+var components    = JSON.parse(system.args[6]);
+var waitForScript = system.args[7];
+var waitForDelay  = parseInt(system.args[8], 10);
 
 page.viewportSize = {
     width: size[0],
@@ -76,6 +78,7 @@ function waitForLoad(cb) {
  * Wait for the wait-for-script (global-level)
  */
 function waitForScriptGlobal(cb) {
+    if (!waitForScript) return cb();
     invoker(_isFinished(waitForScript), function(err) {
         if (err) {
             return cb('wait-for-script (global-level) still not returning a truthy value, timed out after ' +
@@ -89,8 +92,8 @@ function waitForScriptGlobal(cb) {
  * Wait for the wait-for-script (page-level)
  */
 function waitForScriptPage(cb) {
-    var waitForScript = userPage['wait-for-script'] || 'return true;';
-    invoker(_isFinished(waitForScript), function(err) {
+    if (!userPage['wait-for-script']) return cb();
+    invoker(_isFinished(userPage['wait-for-script']), function(err) {
         if (err) {
             return cb('wait-for-script (page-level) still not returning a truthy value, timed out after ' +
                 (maxTries * tryTimeout) + ' ms.');
@@ -193,17 +196,30 @@ function _isLoaded() {
 }
 
 /**
- * Call a wait-for-script user function body
+ * Call a wait-for-script user function script
  *
  * @private
- * @param {String} waitForScript
+ * @param {String} scriptFilename
  * @returns {Function}
  */
-function _isFinished(waitForScript) {
+function _isFinished(scriptFilename) {
+
+    var scriptPath = scriptFilename;
+    if (!fs.isAbsolute(scriptPath)) {
+        scriptPath = basePath + '/' + scriptPath;
+    }
+
+    try {
+        var script = fs.read(scriptPath);
+    } catch (e) {
+        console.log('Could not read file: ' + scriptFilename);
+        phantom.exit(1);
+    }
+
     return function() {
-        return page.evaluate(function(waitForScript) {
-            return (Function(waitForScript))();
-        }, waitForScript);
+        return page.evaluate(function(script) {
+            return (Function(script))();
+        }, script);
     };
 }
 

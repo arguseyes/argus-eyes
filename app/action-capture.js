@@ -36,7 +36,7 @@ module.exports = function capture(id, cb) {
         userConfig.components.length,
         util.plural(userConfig.components.length)));
 
-    var q = async.queue(createWorker(userConfig, baseDir), config.concurrency);
+    var q = async.queue(createWorker(config, userConfig, baseDir), config.concurrency);
 
     var shots = 0, failed = 0;
 
@@ -68,26 +68,28 @@ module.exports = function capture(id, cb) {
 /**
  * Creates a queue worker
  *
- * @param userConfig
- * @param baseDir
+ * @param {{}} config
+ * @param {UserConfig} userConfig
+ * @param {String} baseDir
  * @returns {Function}
  */
-function createWorker(userConfig, baseDir) {
+function createWorker(config, userConfig, baseDir) {
     return function(task, cb) {
-        return queueWorker(userConfig, baseDir, task, cb);
+        return queueWorker(config, userConfig, baseDir, task, cb);
     }
 }
 
 /**
  * The worker itself
  *
+ * @param {{}} config
  * @param {UserConfig} userConfig
  * @param {String} baseDir
  * @param {{ size: String, page: { name: String, url: String, components: String[] } }} task
  * @param {Function} cb
  * @returns {{ shots: Number, failed: Number }} - The number of captures taken and failed.
  */
-function queueWorker(userConfig, baseDir, task, cb) {
+function queueWorker(config, userConfig, baseDir, task, cb) {
 
     var prefixSize = str => util.prefixStdStream('[' + task.size + '] ', str);
     var prefixPage = str => util.prefixStdStream('[page: ' + task.page.name + '] ', str);
@@ -105,12 +107,13 @@ function queueWorker(userConfig, baseDir, task, cb) {
     // Build PhantomJS command and arguments
     var args = [
         __dirname + '/phantomjs-script.js',
+        path.dirname(config.config),
         task.page.url,
         pageBase,
         task.size,
         pageJSON,
         componentsJSON,
-        (userConfig['wait-for-script'] || 'return true'),
+        (userConfig['wait-for-script'] || ''),
         (userConfig['wait-for-delay'] || '0')
     ];
 
