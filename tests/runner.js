@@ -1,5 +1,8 @@
+const auth = require('basic-auth');
 const spawn = require('child_process').spawn;
+const connect = require('connect');
 const fs = require('fs');
+const http = require('http');
 
 /**
  * A fairly random unassigned port
@@ -24,19 +27,36 @@ function startMockServer() {
 
     return new Promise(resolve => {
 
-        console.log('Starting http-server');
+        console.log('Starting http server');
 
-        const mockserver = spawn('node', [
-            __dirname + '/../node_modules/http-server/bin/http-server',
-            '-p', PORT,
-            __dirname + '/mock-server'
-        ], { stdio: 'ignore' });
+        const app = connect();
 
-        // Give http-server a second to start
-        setTimeout(function() {
-            const context = { mockServer: mockserver };
-            resolve(context);
-        }, 2e3);
+        app.use('/credentials.html', function(req, res, next) {
+            var credentials = auth(req);
+            if (!credentials || credentials.name !== 'john' || credentials.pass !== 'secret') {
+                res.statusCode = 401;
+                res.setHeader('WWW-Authenticate', 'Basic realm="argus-eyes"');
+                res.end('Access denied');
+            } else {
+                next();
+            }
+        });
+
+        app.use(function(req, res, next) {
+            if (req.url === '/favicon.ico') return next();
+            try {
+                return fs.createReadStream(__dirname + '/mock-server' + req.url).pipe(res);
+            } catch (e) {
+                next();
+            }
+        });
+
+        app.use(function(req, res) {
+            res.statusCode = 404;
+            res.end('404');
+        });
+
+        const httpServer = http.createServer(app).listen(PORT, () => resolve({ httpServer }));
     });
 }
 
@@ -73,8 +93,7 @@ function runMocha(context) {
 function stopMockServer(context) {
     return new Promise(resolve => {
         console.log('Stopping http-server');
-        context.mockServer.kill();
-        resolve(context);
+        context.httpServer.close(() => resolve(context));
     });
 }
 

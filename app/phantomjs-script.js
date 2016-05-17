@@ -16,20 +16,26 @@ var tryTimeout = 100;
 var invoker = _invoker(maxTries, tryTimeout);
 
 // CLI Arguments
-var basePath      = system.args[1];
-var url           = system.args[2];
-var pageBase      = system.args[3];
-var size          = system.args[4].split('x');
-var userPage      = JSON.parse(system.args[5]);
-var components    = JSON.parse(system.args[6]);
-var delayScript   = system.args[7];
-var delayMs       = parseInt(system.args[8], 10);
-var userScript    = system.args[9];
+var basePath    = system.args[1];
+var url         = system.args[2];
+var pageBase    = system.args[3];
+var size        = system.args[4].split('x');
+var userPage    = JSON.parse(system.args[5]);
+var components  = JSON.parse(system.args[6]);
+var delayScript = system.args[7];
+var delayMs     = parseInt(system.args[8], 10);
+var userScript  = system.args[9];
+var credentials = system.args[10].split(':');
 
 page.viewportSize = {
     width: size[0],
     height: size[1]
 };
+
+if (credentials.length === 2) {
+    page.settings.userName = credentials[0];
+    page.settings.password = credentials[1];
+}
 
 page.onConsoleMessage = function(msg) {
     console.log('console: ' + msg);

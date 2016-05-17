@@ -269,4 +269,31 @@ describe('Action: Capture', function() {
 
     });
 
+    it('should send http basic auth credentials', function() {
+
+        var procCapture = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'capture',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/credentials/credentials.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/credentials')
+        ], { encoding: 'utf8' });
+
+        var procCompare = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/credentials/credentials.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/credentials')
+        ], { encoding: 'utf8' });
+
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
+
+    });
+
 });

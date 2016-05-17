@@ -115,7 +115,8 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
         componentsJSON,
         (userConfig['wait-for-script'] || ''),
         (userConfig['wait-for-delay'] || '0'),
-        (userConfig['run-script'] || '')
+        (userConfig['run-script'] || ''),
+        (userConfig['credentials'] || '')
     ];
 
     // Test argument length

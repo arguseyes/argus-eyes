@@ -213,8 +213,9 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
     }
     // ...
   ],
-  "wait-for-delay": Number   // [Optional] Number of milliseconds to wait
-  "wait-for-script": String  // [Optional] Valid JavaScript return statement
+  "wait-for-delay": Number,  // [Optional] Number of milliseconds to wait
+  "wait-for-script": String, // [Optional] Valid JavaScript return statement
+  "credentials": String      // [Optional] HTTP Basic auth credentials
 }
 ```
 
@@ -279,6 +280,15 @@ thus an entire function body as a string is expected, and multiple lines are all
 ```js
 var search = document.querySelector('.header__search');
 search.classList.add('.header__search_is-open');
+```
+
+#### Credentials
+
+It's possible to specify credentials to be used as HTTP Basic authentication. A string with the username and password
+separated by a colon (`:`) is expected. Example:
+
+```json
+{ "credentials": "john:secret" }
 ```
 
 

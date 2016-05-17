@@ -50,6 +50,17 @@ function getUserConfig() {
  */
 function validateUserConfig(userConfig) {
 
+    // Validate credentials
+    if (typeof userConfig.credentials !== 'undefined') {
+        if (typeof userConfig.credentials !== 'string' || userConfig.credentials.length < 3) {
+            throw new Error('Config: credentials must be a string!');
+        }
+        var credentials = userConfig.credentials.split(':');
+        if (credentials.length !== 2) {
+            throw new Error('Config: credentials must be a correctly formatted string!');
+        }
+    }
+
     // Validate sizes
     if (!Array.isArray(userConfig.sizes) || userConfig.sizes.length < 1) {
         throw new Error('Config: No sizes found!');
