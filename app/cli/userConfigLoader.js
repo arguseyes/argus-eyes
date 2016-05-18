@@ -50,6 +50,18 @@ function getUserConfig() {
  */
 function validateUserConfig(userConfig) {
 
+    // Validate phantomjs flags config
+    if (typeof userConfig['phantomjs-flags'] !== 'undefined') {
+        if (!Array.isArray(userConfig['phantomjs-flags'])) {
+            throw new Error('Config: phantomjs-flags must be an array of strings!');
+        }
+        userConfig['phantomjs-flags'].forEach(flag => {
+            if (typeof flag !== 'string') {
+                throw new Error('Config: phantomjs-flags must be an array of strings!');
+            }
+        });
+    }
+
     // Validate credentials
     if (typeof userConfig.credentials !== 'undefined') {
         if (typeof userConfig.credentials !== 'string' || userConfig.credentials.length < 3) {

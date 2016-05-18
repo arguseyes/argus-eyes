@@ -296,4 +296,31 @@ describe('Action: Capture', function() {
 
     });
 
+    it('should use the phantomjs flags config file', function() {
+
+        var procCapture = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'capture',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/phantomjs-flags/phantomjs-flags.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/phantomjs-flags')
+        ], { encoding: 'utf8' });
+
+        var procCompare = spawnSync('node', [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'compare',
+            'baseline',
+            'test-generated',
+            '--config=' + normalize(__dirname + '/../fixtures/capture/phantomjs-flags/phantomjs-flags.json'),
+            '--base=' + normalize(__dirname + '/../fixtures/capture/phantomjs-flags')
+        ], { encoding: 'utf8' });
+
+        assert.equal(procCapture.status, 0, 'Exitcode not 0!');
+        assert.equal(/saved \d screenshot/i.test(procCapture.stdout), true, "string not found: 'saved x screenshots'");
+
+        assert.equal(procCompare.status, 0, 'Exitcode not 0!');
+        assert.equal(/no significant differences/.test(procCompare.stdout), true, "string not found: 'no significant differences'");
+
+    });
+
 });

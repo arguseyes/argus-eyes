@@ -106,6 +106,7 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
 
     // Build PhantomJS command and arguments
     var args = [
+        userConfig['phantomjs-flags'] || [],
         __dirname + '/phantomjs-script.js',
         path.dirname(config.config),
         task.page.url,
@@ -121,9 +122,8 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
 
     // Test argument length
     var cmd = (phantomjsPath + " '" + args.join("' '") + "'");
-    log.verbose(cmd);
     if (cmd.length > 2048) {
-        log.error(logPrefix('Exceeded maximum safe argument length of 2048, could not start PhantomJS'));
+        log.error(logPrefix('Exceeded maximum safe argument length of 2048, could not start PhantomJS:'));
         log.error(cmd);
         cb(null, { shots: 0, failed: task.page.components.length });
         cb = () => {};
@@ -131,7 +131,7 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
     }
 
     // Run PhantomJS and take screenshot
-    var proc = child_process.spawn(phantomjsPath, args, { encoding: 'utf8' });
+    var proc = child_process.spawn(phantomjsPath, args, { encoding: 'utf8', cwd: path.dirname(config.config) });
 
     // Collect standard streams
     var stdout = '', stderr = '';
@@ -186,8 +186,8 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
         // Report errors if we're still here
         log.error(util.format("PhantomJS errored for page: '%s'", task.page.name));
 
-        if (stderr) log.warning(logPrefix(util.prefixStdStream(' PhantomJS stderr: ', stderr)));
-        if (stdout) log.warning(logPrefix(util.prefixStdStream(' PhantomJS stdout: ', stdout)));
+        if (stderr) log.warning(logPrefix(util.prefixStdStream('PhantomJS stderr: ', stderr)));
+        if (stdout) log.warning(logPrefix(util.prefixStdStream('PhantomJS stdout: ', stdout)));
 
         cb(null, { shots: 0, failed: task.page.components.length });
         cb = () => {};

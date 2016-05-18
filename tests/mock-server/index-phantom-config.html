@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        .header, .footer {
+            display: block;
+            margin: 25px;
+        }
+        .header {
+            width: 250px;
+            height: 100px;
+            background: crimson;
+        }
+        .footer {
+            width: 100px;
+            height: 250px;
+            background: royalblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="header"></div>
+    <div class="footer">
+        <!-- this is a 100x250 crimson rectangle, which should NOT be loaded -->
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAD6CAMAAABgUBJVAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF3BQ8AAAA7wYTwAAAADNJREFUeNrswQENAAAAwqD3T20PBxQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADfJoAAAwBiogABbtf4LQAAAABJRU5ErkJggg==">
+        <!-- -->
+    </div>
+</body>
+</html>

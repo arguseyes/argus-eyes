@@ -215,7 +215,11 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
   ],
   "wait-for-delay": Number,  // [Optional] Number of milliseconds to wait
   "wait-for-script": String, // [Optional] Valid JavaScript return statement
-  "credentials": String      // [Optional] HTTP Basic auth credentials
+  "credentials": String,     // [Optional] HTTP Basic auth credentials
+  "phantomjs-flags": [       // [Optional] Array of PhantomJS flags
+    String                   // PhantomJS CLI flag
+    // ...
+  ]
 }
 ```
 
@@ -285,10 +289,22 @@ search.classList.add('.header__search_is-open');
 #### Credentials
 
 It's possible to specify credentials to be used as HTTP Basic authentication. A string with the username and password
-separated by a colon (`:`) is expected. Example:
+separated by a colon (`:`) is expected.
 
+**Example:**
 ```json
 { "credentials": "john:secret" }
+```
+
+#### PhantomJS flags
+
+If you need to specify any PhantomJS commandline flags, it's possible to do so as an array of strings. See the official
+[PhantomJS CLI documentation](http://phantomjs.org/api/command-line.html) for all supported CLI options. If any relative
+paths are given, they're relative to your config file.
+
+**Example:**
+```json
+{ "phantomjs-flags": ["--load-images=false"] }
 ```
 
 

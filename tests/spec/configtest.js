@@ -193,4 +193,20 @@ describe('Action: Configtest', function() {
 
     });
 
+    it('should fail with incorrect phantomjs-flags', function() {
+
+        var args = [
+            normalize(__dirname + '/../../bin/argus-eyes.js'),
+            'configtest',
+            '--config=tests/fixtures/configtest/invalid-phantomjs-flags.json'
+        ];
+
+        var proc = spawnSync('node', args, { encoding: 'utf8' });
+
+        assert.equal(proc.status, 1, 'Exitcode not 1!');
+        assert.equal(/Config invalid/.test(proc.stdout), true, proc.stdout);
+        assert.equal(/phantomjs-flags must be an array of strings/.test(proc.stdout), true, proc.stdout);
+
+    });
+
 });
