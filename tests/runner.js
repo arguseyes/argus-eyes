@@ -32,7 +32,7 @@ function startMockServer() {
         const app = connect();
 
         app.use('/credentials.html', function(req, res, next) {
-            var credentials = auth(req);
+            const credentials = auth(req);
             if (!credentials || credentials.name !== 'john' || credentials.pass !== 'secret') {
                 res.statusCode = 401;
                 res.setHeader('WWW-Authenticate', 'Basic realm="argus-eyes"');
@@ -43,12 +43,13 @@ function startMockServer() {
         });
 
         app.use(function(req, res, next) {
-            if (req.url === '/favicon.ico') return next();
+            const filename = __dirname + '/mock-server' + req.url;
             try {
-                return fs.createReadStream(__dirname + '/mock-server' + req.url).pipe(res);
-            } catch (e) {
-                next();
-            }
+                if (fs.statSync(filename).isFile()) {
+                    return fs.createReadStream(filename).pipe(res);
+                }
+            } catch (e) {}
+            next();
         });
 
         app.use(function(req, res) {
