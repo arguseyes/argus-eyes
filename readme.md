@@ -188,36 +188,43 @@ The config needs to be valid [JSON](http://www.json.org/), and it needs to obey 
 ```js
 {
   "sizes": [
-    String                   // Size string, example: "1024x768"
+    String                       // Size string, example: "1024x768"
     // ...
   ],
   "pages": [
     {
-      "name": String,        // Identifier, used in filenames
-      "url": String,         // Valid URL
+      "name": String,            // Identifier, used in filenames
+      "url": String,             // Valid URL
       "components": [
-        String               // Component identifier
+        String                   // Component identifiers
         // ...
-      ]
+      ],
+      "wait-for-delay": Number,  // [Optional] Number of milliseconds to wait
+      "wait-for-script": String, // [Optional] Path to JS file with function body
+      "run-script": String       // [Optional] Path to JS file with script
     }
     // ...
   ],
   "components": [
     {
-      "name": String,        // Identifier, used in page objects and filenames
-      "selector": String,    // CSS selector, to clip the screenshot
-      "ignore": [            // [Optional] Array of excluded child elements
-        String               // CSS selector, to `display:none` a child element
+      "name": String,            // Identifier, used in page objects and filenames
+      "selector": String,        // CSS selector, to clip the screenshot
+      "ignore": [                // [Optional] Array of excluded child elements
+        String                   // CSS selector, to `display:none` a child element
         // ...
-      ]
+      ],
+      "wait-for-delay": Number,  // [Optional] Number of milliseconds to wait
+      "wait-for-script": String, // [Optional] Path to JS file with function body
+      "run-script": String       // [Optional] Path to JS file with script
     }
     // ...
   ],
-  "wait-for-delay": Number,  // [Optional] Number of milliseconds to wait
-  "wait-for-script": String, // [Optional] Valid JavaScript return statement
-  "credentials": String,     // [Optional] HTTP Basic auth credentials
-  "phantomjs-flags": [       // [Optional] Array of PhantomJS flags
-    String                   // PhantomJS CLI flag
+  "wait-for-delay": Number,      // [Optional] Number of milliseconds to wait
+  "wait-for-script": String,     // [Optional] Path to JS file with function body
+  "run-script": String,          // [Optional] Path to JS file with script
+  "credentials": String,         // [Optional] HTTP Basic auth, example: "john:secret"
+  "phantomjs-flags": [           // [Optional] Array of PhantomJS flags
+    String                       // PhantomJS CLI flag
     // ...
   ]
 }
@@ -231,21 +238,24 @@ To simply wait for a fixed time, use `wait-for-delay`. For more complex conditio
 returns a truthy value whenever the page is ready: see `wait-for-script`. If you've got any one-time actions such as
 components to activate or dialogs to close, you should use `run-script`.
 
-You are allowed to specify `wait-for-delay` and `wait-for-script` on 3 levels: global, page and component, when multiple
-are found, they're all executed in this order. It's also allowed to specify both a delay and a script. All scripts will
-always be executed before all delays.
+You are allowed to specify `wait-for-delay`, `wait-for-script` and `run-script` on 3 levels: global, page and component.
+The highest delay is executed first, then all `wait-for-script` files in order, then all `run-script` files.
 
-There's a global timeout of 10 seconds on the PhantomJS script, the screenshots should be taken within that time.
+**Be advised**: There's a global timeout of 10 seconds on the internal PhantomJS script, the screenshots of all
+components on a page should be taken within that time.
 
 
 #### Wait for delay
 
-This will delay taking the screenshots, specify the milliseconds as a JavaScript number.
+This will delay taking the screenshots, specify the milliseconds as a JavaScript number. When multiple delays are found
+only the highest delay is executed, the others are discarded.
 
 #### Wait for script
 
 You can specify a JavaScript function body to tell argus eyes whenever the page and it's components are finished loading.
 The `wait-for-script` string must contain a filename. If a relative path is given, it's relative to your config file.
+
+Multiple scripts will be executed in the order: global, page, component.
 
 The contents of the script can be seen as a function body, without the `function() {` and `}` parts around it. You are
 required to return a truthy value to indicate argus eyes can take the screenshot. Your function is **invoked
@@ -270,6 +280,8 @@ return isFinished;
 
 The `run-script` option differs from `wait-for-script` in that it's only executed once, after any `wait-for-script`
 and `wait-for-delay`.
+
+Multiple scripts will be executed in the order: global, page, component.
 
 Internally, the contents of the file are passed as a string to the
 [`Function()` constructor](http://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function),
