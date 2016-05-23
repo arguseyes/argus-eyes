@@ -133,20 +133,23 @@ function waitForScript(cb) {
  */
 function waitForDelay(cb) {
 
+    var timeouts = [];
+
     // Wait for - level global
-    setTimeout(function() {
+    timeouts.push(delayMs);
 
-        // Wait for - level page
-        var delay = parseInt(userPage['wait-for-delay'], 10) || 0;
-        setTimeout(function() {
+    // Wait for - level page
+    var delay = parseInt(userPage['wait-for-delay'], 10) || 0;
+    timeouts.push(delay);
 
-            // Wait for - level components
-            async.waterfall(components.map(function(component) {
-                var delay = parseInt(component['wait-for-delay'], 10) || 0;
-                return function(cb) { setTimeout(cb, delay); };
-            }), function() { cb(); });
-        }, delay);
-    }, delayMs);
+    // Wait for - level components
+    components.forEach(function(component) {
+        var delay = parseInt(component['wait-for-delay'], 10) || 0;
+        timeouts.push(delay);
+    });
+
+    var timeout = Math.max.apply(null, timeouts);
+    setTimeout(cb, timeout);
 }
 
 /**
