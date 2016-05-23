@@ -1,5 +1,5 @@
 {
-  "phantomjs-flags": ["--load-images=false"],
+  "phantomjs-flags": ["--ignore-ssl-errors=true", "--load-images=false"],
   "sizes": ["768x1024"],
   "pages": [
     {

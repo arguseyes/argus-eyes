@@ -105,20 +105,22 @@ function queueWorker(config, userConfig, baseDir, task, cb) {
         userConfig.components.find(component => component.name === componentId)));
 
     // Build PhantomJS command and arguments
-    var args = [
+    var args = [].concat(
         userConfig['phantomjs-flags'] || [],
-        __dirname + '/phantomjs-script.js',
-        path.dirname(config.config),
-        task.page.url,
-        pageBase,
-        task.size,
-        pageJSON,
-        componentsJSON,
-        (userConfig['wait-for-script'] || ''),
-        (userConfig['wait-for-delay'] || '0'),
-        (userConfig['run-script'] || ''),
-        (userConfig['credentials'] || '')
-    ];
+        [
+            __dirname + '/phantomjs-script.js',
+            path.dirname(config.config),
+            task.page.url,
+            pageBase,
+            task.size,
+            pageJSON,
+            componentsJSON,
+            (userConfig['wait-for-script'] || ''),
+            (userConfig['wait-for-delay'] || '0'),
+            (userConfig['run-script'] || ''),
+            (userConfig['credentials'] || '')
+        ]
+    );
 
     // Test argument length
     var cmd = (phantomjsPath + " '" + args.join("' '") + "'");
