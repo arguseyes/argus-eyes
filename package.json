@@ -37,7 +37,7 @@
   },
   "homepage": "http://arguseyes.io/",
   "dependencies": {
-    "async": "^2.0.0-rc.4",
+    "async": "^2.0.0-rc.5",
     "blink-diff": "^1.0.12",
     "chalk": "^1.1.1",
     "glob": "^7.0.3",
@@ -45,11 +45,11 @@
     "mkdirp": "^0.5.1",
     "phantomjs-prebuilt": "^2.1.4",
     "rimraf": "^2.5.0",
-    "yargs": "^4.7.0"
+    "yargs": "^4.7.1"
   },
   "devDependencies": {
     "basic-auth": "^1.0.4",
     "connect": "^3.4.1",
-    "mocha": "^2.3.4"
+    "mocha": "^2.5.1"
   }
 }
