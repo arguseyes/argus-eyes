@@ -3,6 +3,7 @@ var fs = require('fs');
 
 // 10s timeout on this script
 setTimeout(function() {
+    console.log('Global timeout (10s per page) has expired.');
     return phantom.exit(1);
 }, 10 * 1000);
 
