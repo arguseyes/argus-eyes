@@ -37,6 +37,7 @@
   },
   "homepage": "http://arguseyes.io/",
   "dependencies": {
+    "ajv": "^4.1.1",
     "async": "^2.0.0-rc.5",
     "blink-diff": "^1.0.12",
     "chalk": "^1.1.1",
