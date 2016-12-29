@@ -58,7 +58,7 @@ module.exports = function capture(id, cb) {
             id));
 
         if (failed > 0) {
-            log.warning(util.format('Failed to take %d sceenshot%s', failed, util.plural(failed)));
+            log.warning(util.format('Failed to take %d screenshot%s', failed, util.plural(failed)));
         }
 
         cb(failed === 0);
