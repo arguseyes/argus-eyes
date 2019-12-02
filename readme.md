@@ -1,14 +1,22 @@
-# [Argus Eyes](http://arguseyes.io/) [![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
+# DEPRECATED - [Argus Eyes](http://arguseyes.io/) [![npm version](https://badge.fury.io/js/argus-eyes.svg)](https://www.npmjs.org/package/argus-eyes)
 
-| Linux & Mac OS X | Windows |
-| --- | --- |
+| No Maintenance Intended | Linux & Mac OS X | Windows |
+| --- | --- | --- |
+| [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) |
 | [![build status](https://travis-ci.org/arguseyes/argus-eyes.svg?branch=dev)](https://travis-ci.org/arguseyes/argus-eyes) | [![build status](https://ci.appveyor.com/api/projects/status/github/arguseyes/argus-eyes?branch=dev&svg=true)](https://ci.appveyor.com/project/BranvanderMeer/argus-eyes) |
 
 A lightweight commandline tool for visual regression testing of UI components.
 
+## Deprecated, why?
+Argus Eyes is based on the headless browser PhantomJS, which is not maintained anymore.
+Shifting away from PhantomJS would be a massive rewrite and we currently have other priorities.
+
+## Alternatives
+We see [BackstopJS](https://github.com/garris/BackstopJS) as a good open-source alternative.
 
 ## Contents
-
+- [Overview](#overview)
+- [Introduction](#introduction)
 - [Overview](#overview)
 - [Introduction](#introduction)
 - [Authors](#authors)
